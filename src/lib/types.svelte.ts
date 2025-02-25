@@ -81,5 +81,6 @@ export class File extends AFile {
 }
 
 export class FileSectorViewConfig {
-    previewSize: number = 24;
+    previewSize: number = 34;
+    filenameSize: number = 21;
 }
