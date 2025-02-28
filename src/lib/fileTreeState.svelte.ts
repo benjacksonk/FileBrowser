@@ -39,5 +39,6 @@ function generateRootFileSector() {
             new File("Pig.webp")
         ]),
         new FileSector("Videos")
-    ]);
+    ])
+    .files.find(it => it instanceof FileSector && it.fileName === "Documents") as FileSector //temp;
 }
