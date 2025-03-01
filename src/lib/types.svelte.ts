@@ -1,7 +1,7 @@
 export class FileType {
     static #categoryPerType: Map<FileType, string> = new Map<FileType, string>();
 
-    static defaultProperties: string[] = [ "File Name", "File Type", "File Size"];
+    static defaultProperties: string[] = [ "Name", "Extension", "Type", "Size"];
     static perExtension: Map<string, FileType> = new Map<string, FileType>();
     static fileTypes: Set<FileType> = new Set<FileType>();
 
@@ -26,9 +26,10 @@ export class FileType {
     );
 
     static defaultsPerProperty: Map<string, any> = new Map<string, any>([
-        ["File Name", ""],
-        ["File Type", FileType.unspecifiedFileType],
-        ["File Size", 0],
+        ["Name", ""],
+        ["Extension", ""],
+        ["Type", FileType.unspecifiedFileType],
+        ["Size", 0],
         ["Image Width (px)", 0],
         ["Image Height (px)", 0]
     ]);
@@ -65,19 +66,18 @@ export class FileType {
 }
 
 export abstract class AFile {
-    valuesPerProperty: Map<string, any> = new Map<string, any>();
+    valuesPerProperty: Map<string, any> = $state(new Map<string, any>());
 
-    constructor(name: string) {
-        this.trySetProperty("File Name", name); 
-        this.fileType.properties.forEach(property => {
-            this.trySetProperty(property, FileType.defaultsPerProperty.get(property)); 
-        });
-        this.trySetProperty("File Name", name); 
-    }
-
-    get extension(): string {
-        let ext = this.fileName.split(".").reverse()[0];
-        return ext;
+    constructor(nameWithExtension: string) {
+        if (nameWithExtension.includes(".") && !nameWithExtension.endsWith(".")) {
+            let name = nameWithExtension.split(".");
+            let extension = name.pop() as string;
+            this.trySetProperty("Name", name.join());
+            this.trySetProperty("Extension", extension);
+        }
+        else {
+            this.trySetProperty("Name", nameWithExtension);
+        }
     }
     
     get preview(): string {
@@ -95,49 +95,66 @@ export abstract class AFile {
         }
 
         this.valuesPerProperty.set(propertyName, value);
-        if (propertyName === "File Name") {
-            this.trySetProperty("File Type", FileType.getFileTypeByExtension(this.extension));
+
+        if (propertyName === "Extension") {
+            this.trySetProperty("Type", FileType.getFileTypeByExtension(value));
         }
+        else if (propertyName === "Type") {
+            let newType = value as FileType;
+            let mandatedProperties = newType.properties;
+            let oldProperties = [...this.valuesPerProperty.keys()];
+            let obsoleteProperties = oldProperties.filter(it => !mandatedProperties.includes(it));
+            let missingProperties = mandatedProperties.filter(it => !oldProperties.includes(it));
+            
+            obsoleteProperties.forEach(it => this.valuesPerProperty.delete(it));
+            missingProperties.forEach(it => this.valuesPerProperty.set(it, FileType.defaultsPerProperty.get(it)));
+        }
+
         return true;
     }
     
-    get fileName(): string {
-        return this.tryGetProperty("File Name");
+    get name(): string {
+        return this.tryGetProperty("Name");
     }
-    set fileName(newName: string) {
-        this.trySetProperty("File Name", newName);
+    set name(newName: string) {
+        this.trySetProperty("Name", newName);
+    }
+
+    get extension(): string {
+        return this.tryGetProperty("Extension");
+    }
+    set extension(newExtension: string) {
+        this.trySetProperty("Extension", newExtension);
     }
     
     get fileType(): FileType {
-        return this.tryGetProperty("File Type");
+        return this.tryGetProperty("Type");
     }
     set fileType(newFileType: FileType) {
-        this.trySetProperty("File Type", newFileType);
+        this.trySetProperty("Type", newFileType);
     }
     
     get fileSize(): number {
-        return this.tryGetProperty("File Size");
+        return this.tryGetProperty("Size");
     }
     set fileSize(newFileSize: number) {
-        this.trySetProperty("File Size", newFileSize);
+        this.trySetProperty("Size", newFileSize);
     }
 }
 
 export class FileSector extends AFile {
-    viewConfig: FileSectorViewConfig = new FileSectorViewConfig();
-    files: AFile[] = [];
+    viewConfig: FileSectorViewConfig = $state(new FileSectorViewConfig());
+    files: AFile[] = $state([]);
 
     constructor(name: string, files: AFile[] = []) {
         super(name);
-        this.trySetProperty("File Type", FileType.fileSectorFileType);
+        this.trySetProperty("Type", FileType.fileSectorFileType);
         this.files = files;
     }
 }
 
 export class File extends AFile {
-    #preview: string = "";
-
-    //properties: <FileProperty, string>
+    #preview: string = $state("");
 
     constructor(name: string, preview: string = "") {
         super(name);
@@ -150,7 +167,7 @@ export class File extends AFile {
 }
 
 export class FileSectorViewConfig {
-    previewSize: number = 21;
-    fileNameSize: number = 13;
-    orderedProperty: string = "File Name";
+    previewSize: number = $state(21);
+    fileNameSize: number = $state(13);
+    orderedProperty: string = $state("Name");
 }

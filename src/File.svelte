@@ -3,10 +3,12 @@
 
     let {
         afile,
-        fileSectorViewConfig
+        fileSectorViewConfig,
+        showFileExtension
     } : {
         afile: AFile,
-        fileSectorViewConfig: FileSectorViewConfig
+        fileSectorViewConfig: FileSectorViewConfig,
+        showFileExtension: boolean
     } = $props();
 </script>
 
@@ -14,7 +16,9 @@
 
 <div class="File" style:gap={`${fileSectorViewConfig.previewSize * (Math.sqrt(2) - 1)}px`}>
     <img class="filePreview" alt="" src={afile.preview} style:height={`${fileSectorViewConfig.previewSize}px`}>
-    <span class="fileName" style:font-size={`${fileSectorViewConfig.fileNameSize}px`}>{afile.fileName}</span>
+    <span class="fileName" style:font-size={`${fileSectorViewConfig.fileNameSize}px`}>
+        {showFileExtension ? `${afile.name}.${afile.extension}` : afile.name}
+    </span>
 </div>
 
 

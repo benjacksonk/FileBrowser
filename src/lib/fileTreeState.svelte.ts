@@ -1,8 +1,23 @@
 import { File, FileSector } from "./types.svelte";
 
-export const rootFileSector = $state(generateRootFileSector());
+export const rootFileSectorState = $state(generateRootFileSector());
 
 function generateRootFileSector() {
+    return new FileSector("Documents", [
+        new File("June.doc"),
+        new FileSector("January"),
+        new File("November.doc"),
+        new File("April.doc"),
+        new FileSector("July"),
+        new File("February.txt"),
+        new FileSector("December"),
+        new File("May.pdf"),
+        new File("September.doc"),
+        new File("October.png"),
+        new File("March.doc"),
+        new File("August.png")
+    ]);
+    
     return new FileSector("Root", [
         // apps tools installations addons extensions programs utilities modules
         new FileSector("Apps"),
@@ -40,5 +55,5 @@ function generateRootFileSector() {
         ]),
         new FileSector("Videos")
     ])
-    .files.find(it => it instanceof FileSector && it.fileName === "Documents") as FileSector //temp;
+    .files.find(it => it instanceof FileSector && it.name === "Documents") as FileSector //temp;
 }
