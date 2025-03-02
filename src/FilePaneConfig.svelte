@@ -6,19 +6,18 @@
     } : {
         orderedProperty: string
     } = $props();
-
-    function handleClickOrderedProperty(event: MouseEvent, propertyName: string) {
-        orderedProperty = propertyName;
-    }
 </script>
 
 
 
 <div class="FilePaneConfig">
-    <div>Ordered Property: <i>{orderedProperty}</i></div>
-    {#each FileType.defaultsPerProperty.keys() as propertyName}
-    <button onmousedown={(event) => handleClickOrderedProperty(event, propertyName)}>{propertyName}</button>
-    {/each}
+    <label for="select-orderedProperty">Ordered Property: <i>{orderedProperty}</i></label>
+    
+    <select id="select-orderedProperty" name="select-orderedProperty" bind:value={orderedProperty}>
+        {#each FileType.defaultsPerProperty.keys() as propertyName}
+        <option value={propertyName}>{propertyName}</option>
+        {/each}
+    </select>
 </div>
 
 
