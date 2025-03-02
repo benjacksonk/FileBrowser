@@ -1,9 +1,9 @@
 <script lang="ts">
     let {
-        splitFolderPane = $bindable(true),
+        splitSubsectors = $bindable(true),
         showFileExtensions = $bindable(true)
     } : {
-        splitFolderPane: boolean,
+        splitSubsectors: boolean,
         showFileExtensions: boolean
     } = $props();
 </script>
@@ -11,9 +11,9 @@
 
 
 <div class="FileBrowserConfig">
-    <label for="splitFolderPane">
-        <input id="splitFolderPane" type="checkbox" name="splitFolderPane" bind:checked={splitFolderPane}/>
-        Split Folder Pane
+    <label for="splitSubsectors">
+        <input id="splitSubsectors" type="checkbox" name="splitSubsectors" bind:checked={splitSubsectors}/>
+        Split Subsectors
     </label>
     <label for="showFileExtensions">
         <input id="showFileExtensions" type="checkbox" name="showFileExtensions" bind:checked={showFileExtensions}/>

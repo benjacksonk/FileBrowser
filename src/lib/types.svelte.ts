@@ -70,10 +70,10 @@ export abstract class AFile {
 
     constructor(nameWithExtension: string) {
         if (nameWithExtension.includes(".") && !nameWithExtension.endsWith(".")) {
-            let name = nameWithExtension.split(".");
-            let extension = name.pop() as string;
-            this.trySetProperty("Name", name.join());
+            let nameParts = nameWithExtension.split(".");
+            let extension = nameParts.pop() as string;
             this.trySetProperty("Extension", extension);
+            this.trySetProperty("Name", nameParts.join("."));
         }
         else {
             this.trySetProperty("Name", nameWithExtension);
@@ -143,13 +143,45 @@ export abstract class AFile {
 }
 
 export class FileSector extends AFile {
-    viewConfig: FileSectorViewConfig = $state(new FileSectorViewConfig());
-    files: AFile[] = $state([]);
+    afiles: AFile[] = $state([]);
+    previewSize: number = 21;
+    nameSize: number = 13;
+    
+    #orderedProperty: string = "Name";
 
     constructor(name: string, files: AFile[] = []) {
         super(name);
         this.trySetProperty("Type", FileType.fileSectorFileType);
-        this.files = files;
+        this.afiles = files;
+    }
+    
+    get sectors(): FileSector[] {
+        return this.afiles.filter(it => it instanceof FileSector);
+    }
+    
+    get files(): File[] {
+        return this.afiles.filter(it => it instanceof File);
+    }
+
+    get orderedProperty(): string {
+        return this.#orderedProperty;
+    }
+    set orderedProperty(newProperty: string) {
+        this.#orderedProperty = newProperty;
+        this.#sort(this.orderedProperty);
+    }
+    
+    #sort(propertyName: string) {
+        this.afiles.sort((a: AFile, b: AFile): number => {
+            let orderedProperty = this.orderedProperty;
+            let propertyA = a.tryGetProperty(orderedProperty);
+            let propertyB = b.tryGetProperty(orderedProperty);
+            if (orderedProperty === "Type") {
+                propertyA = propertyA.name;
+                propertyB = propertyB.name;
+            }
+            return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
+        });
     }
 }
 
@@ -164,10 +196,4 @@ export class File extends AFile {
     // get preview(): string {
     //     return this.#preview === "" ? super.preview : this.#preview;
     // }
-}
-
-export class FileSectorViewConfig {
-    previewSize: number = $state(21);
-    fileNameSize: number = $state(13);
-    orderedProperty: string = $state("Name");
 }

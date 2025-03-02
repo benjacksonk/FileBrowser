@@ -1,6 +1,6 @@
 import { File, FileSector } from "./types.svelte";
 
-export const rootFileSectorState = $state(generateRootFileSector());
+export const rootFileSectorState = $state<FileSector>(generateRootFileSector());
 
 function generateRootFileSector() {
     return new FileSector("Documents", [
@@ -55,5 +55,5 @@ function generateRootFileSector() {
         ]),
         new FileSector("Videos")
     ])
-    .files.find(it => it instanceof FileSector && it.name === "Documents") as FileSector //temp;
+    .sectors.find(it => it.name === "Documents") as FileSector //temp;
 }

@@ -1,24 +1,26 @@
 <script lang="ts">
-    import { FileSectorViewConfig, type AFile } from "$lib/types.svelte";
+    import { type AFile } from "$lib/types.svelte";
 
     let {
-        afile,
-        fileSectorViewConfig,
+        afile = $bindable(),
+        previewSize,
+        nameSize,
         showFileExtension
     } : {
         afile: AFile,
-        fileSectorViewConfig: FileSectorViewConfig,
+        previewSize: number,
+        nameSize: number,
         showFileExtension: boolean
     } = $props();
+
+    let displayName = $derived(showFileExtension && afile.extension !== "" ? `${afile.name}.${afile.extension}` : afile.name);
 </script>
 
 
 
-<div class="File" style:gap={`${fileSectorViewConfig.previewSize * (Math.sqrt(2) - 1)}px`}>
-    <img class="filePreview" alt="" src={afile.preview} style:height={`${fileSectorViewConfig.previewSize}px`}>
-    <span class="fileName" style:font-size={`${fileSectorViewConfig.fileNameSize}px`}>
-        {showFileExtension ? `${afile.name}.${afile.extension}` : afile.name}
-    </span>
+<div class="File" style:gap={`${previewSize * (Math.sqrt(2) - 1)}px`}>
+    <img class="filePreview" alt="" src={afile.preview} style:height={`${previewSize}px`}>
+    <span class="fileName" style:font-size={`${nameSize}px`}>{displayName}</span>
 </div>
 
 

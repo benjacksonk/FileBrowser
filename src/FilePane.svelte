@@ -1,39 +1,41 @@
 <script lang="ts">
-    import { AFile, FileSector, FileType } from "$lib/types.svelte";
+    import { browserState } from "$lib/browserState.svelte";
     import { rootFileSectorState } from "$lib/fileTreeState.svelte";
-    import File from "./File.svelte";
+    import FileArray from "./FileArray.svelte";
     import FilePaneConfig from "./FilePaneConfig.svelte";
     import FileBrowserConfig from "./FileBrowserConfig.svelte";
-
-    let splitFolderPane: boolean = $state(true);
-    let showFileExtensions: boolean = $state(true);
-
-    let sortedFiles: AFile[] = $derived(
-        rootFileSectorState.files.toSorted((a: AFile, b: AFile): number => {
-            let orderedProperty = rootFileSectorState.viewConfig.orderedProperty;
-            let propertyA = a.tryGetProperty(orderedProperty);
-            let propertyB = b.tryGetProperty(orderedProperty);
-            if (orderedProperty === "Type") {
-                propertyA = propertyA.name;
-                propertyB = propertyB.name;
-            }
-            return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
-        }));
-    let subSectors: FileSector[] = $derived(sortedFiles.filter(it => it instanceof FileSector));
-    let subFiles: FileSector[] = $derived(sortedFiles.filter(it => it !instanceof FileSector));
 </script>
 
 
 
 <div class="FilePane">
-    <div class="configBar">
-        <FileBrowserConfig bind:splitFolderPane bind:showFileExtensions/>
-        <FilePaneConfig bind:fileSectorViewConfig={rootFileSectorState.viewConfig}/>
+    <FileBrowserConfig 
+        bind:splitSubsectors={browserState.splitSubsectors}
+        bind:showFileExtensions={browserState.showFileExtension}
+    />
+
+    <FilePaneConfig bind:orderedProperty={rootFileSectorState.orderedProperty}/>
+
+    <div class="fileArrays">
+        {#if browserState.splitSubsectors}
+        <FileArray 
+            bind:sortedFiles={rootFileSectorState.sectors} 
+            bind:previewSize={browserState.subsectorPanePreviewSize} 
+            bind:nameSize={browserState.subsectorPaneNameSize}
+        />
+        <FileArray 
+            bind:sortedFiles={rootFileSectorState.files} 
+            bind:previewSize={rootFileSectorState.previewSize} 
+            bind:nameSize={rootFileSectorState.nameSize}
+        />
+        {:else}
+        <FileArray 
+            bind:sortedFiles={rootFileSectorState.afiles} 
+            bind:previewSize={rootFileSectorState.previewSize} 
+            bind:nameSize={rootFileSectorState.nameSize}
+        />
+        {/if}
     </div>
-    
-    {#each sortedFiles as afile}
-    <File {afile} fileSectorViewConfig={rootFileSectorState.viewConfig} showFileExtension={showFileExtensions}/>
-    {/each}
 </div>
 
 
@@ -43,15 +45,13 @@
         width: 100%;
         height: 100%;
         padding: 20px;
-        display: grid;
-        gap: 10px;
-        align-content: start;
-        justify-content: flex-start;
     }
 
-    .configBar {
+    .fileArrays {
         width: 100%;
-        display: flex;
-        flex-flow: row nowrap;
+        height: 100%;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 50%;
     }
 </style>
