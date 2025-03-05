@@ -1,6 +1,6 @@
 import { File, FileSector } from "./types.svelte";
 
-export const rootFileSectorState = $state<FileSector>(generateRootFileSector());
+export const fileTreeState = $state<FileSector>(generateRootFileSector());
 
 function generateRootFileSector() {
     return new FileSector("Documents", [

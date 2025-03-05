@@ -1,11 +1,11 @@
 <script lang="ts">
-    import FilePane from "./FilePane.svelte";
+    import SectorContents from "./SectorContents.svelte";
 </script>
 
 
 
 <div class="Browser">
-    <FilePane/>
+    <SectorContents/>
 </div>
 
 

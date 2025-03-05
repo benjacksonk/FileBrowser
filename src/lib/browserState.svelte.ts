@@ -1,6 +1,6 @@
 export const browserState = $state({
-    showFileExtension: true,
+    showFileExtensions: true,
     splitSubsectors: false,
-    subsectorPanePreviewSize: 21,
-    subsectorPaneNameSize: 13
+    defaultPreviewSize: 21,
+    defaultPaneNameSize: 13
 });

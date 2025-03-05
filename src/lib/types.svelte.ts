@@ -142,17 +142,27 @@ export abstract class AFile {
     }
 }
 
+export enum FileFlow {
+    List ="List",
+    PortraitColumns = "Portrait Columns",
+    LandscapeColumns = "Landscape Columns",
+    PortraitRows = "Portrait Rows",
+    LandscapeRows = "Landscape Rows"
+}
+
 export class FileSector extends AFile {
     afiles: AFile[] = $state([]);
     previewSize: number = 21;
     nameSize: number = 13;
+    flow: FileFlow = FileFlow.LandscapeRows; //LandscapeColumns
     
-    #orderedProperty: string = "Name";
+    #orderedProperty: string = "";
 
     constructor(name: string, files: AFile[] = []) {
         super(name);
         this.trySetProperty("Type", FileType.fileSectorFileType);
         this.afiles = files;
+        this.orderedProperty = "Name";
     }
     
     get sectors(): FileSector[] {
