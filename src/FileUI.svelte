@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type AFile } from "$lib/types.svelte";
+    import { type File } from "$lib/types.svelte";
 
     let {
         afile = $bindable(),
@@ -9,7 +9,7 @@
         nameBelow, 
         detailsBelow
     } : {
-        afile: AFile,
+        afile: File,
         previewSize: number,
         nameSize: number,
         showFileExtension: boolean, 
@@ -22,7 +22,7 @@
 
 
 
-<div class="File" 
+<div class="FileUI" 
     style:gap={`${previewSize * (Math.sqrt(2) - 1)}px`} 
     style:flex-flow={`${nameBelow ? "column" : "row"} nowrap`} 
     style:align-items={"center"} 
@@ -42,7 +42,7 @@
 
 
 <style>
-    .File {
+    .FileUI {
         width: fit-content;
         height: fit-content;
         display: flex;

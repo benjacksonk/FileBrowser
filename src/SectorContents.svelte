@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { FileFlow } from "$lib/types.svelte";
+    import { Layout } from "$lib/types.svelte";
     import { browserState } from "$lib/browserState.svelte";
     import { fileTreeState } from "$lib/fileTreeState.svelte";
-    import FileArray from "./FileArray.svelte";
     import FileBrowserConfig from "./FileBrowserConfig.svelte";
     import SectorViewConfig from "./SectorViewConfig.svelte";
+    import FileGroupUI from "./FileGroupUI.svelte";
+    
+    let isByRows = $derived(fileTreeState.flow === Layout.LandscapeRows || fileTreeState.flow === Layout.PortraitRows);
 </script>
 
 
@@ -15,32 +17,35 @@
         bind:showFileExtensions={browserState.showFileExtensions}
     />
     <SectorViewConfig 
+        bind:groupedProperty={fileTreeState.groupedProperty}
         bind:orderedProperty={fileTreeState.orderedProperty}
         bind:flow={fileTreeState.flow}
     />
 
-    <div class="fileArrays">
+    <div class="fileSupergroup">
         {#if browserState.splitSubsectors}
-            <FileArray 
-                bind:files={fileTreeState.sectors} 
-                bind:previewSize={browserState.defaultPreviewSize} 
-                bind:nameSize={browserState.defaultPaneNameSize}
-                flow={FileFlow.LandscapeColumns}
-            />
-            <FileArray 
-                bind:files={fileTreeState.files} 
-                bind:previewSize={fileTreeState.previewSize} 
-                bind:nameSize={fileTreeState.nameSize}
+        <div class="fileGroups" style:grid-auto-flow={"row"}>
+            {#each fileTreeState.sectorGroups as fileGroup}
+            <FileGroupUI 
+                {fileGroup} 
+                previewSize={fileTreeState.previewSize} 
+                nameSize={fileTreeState.nameSize} 
                 flow={fileTreeState.flow}
             />
-        {:else}
-            <FileArray 
-                bind:files={fileTreeState.afiles} 
-                bind:previewSize={fileTreeState.previewSize} 
-                bind:nameSize={fileTreeState.nameSize}
-                flow={fileTreeState.flow}
-            />
+            {/each}
+        </div>
         {/if}
+        
+        <div class="fileGroups" style:grid-auto-flow={isByRows ? "column" : "row"}>
+            {#each (browserState.splitSubsectors ? fileTreeState.assetGroups : fileTreeState.fileGroups) as fileGroup}
+            <FileGroupUI 
+                {fileGroup}
+                previewSize={fileTreeState.previewSize} 
+                nameSize={fileTreeState.nameSize} 
+                flow={fileTreeState.flow}
+            />
+            {/each}
+        </div>
     </div>
 </div>
 
@@ -53,11 +58,23 @@
         padding: 20px;
     }
 
-    .fileArrays {
+    .fileSupergroup {
         width: 100%;
         height: 100%;
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: minmax(0,1fr);
+    }
+
+    .fileGroups {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        gap: 10px;
+        grid-auto-rows: minmax(0,1fr);
+        grid-auto-columns: minmax(0,1fr);
+        grid-template: repeat(auto-fit, minmax(0,1fr)) / repeat(auto-fit, minmax(0,1fr));
+        align-content: start;
+        justify-content: start;
     }
 </style>
