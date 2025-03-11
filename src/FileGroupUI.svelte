@@ -25,9 +25,9 @@
 
 
 <div class="FileGroupUI">
-    <!-- {#if fileGroup.propertyValue !== "" && fileGroup.propertyValue != null} -->
+    {#if showHeader}
     <span class="groupHeader">{fileGroup.legiblePropertyValue}</span>
-    <!-- {/if} -->
+    {/if}
 
     <div class="files"
         style:font-size={`${nameSize}px`}
