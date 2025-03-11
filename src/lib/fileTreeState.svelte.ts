@@ -3,7 +3,7 @@ import { Asset, FileSector } from "./types.svelte";
 export const fileTreeState = $state<FileSector>(generateRootFileSector());
 
 function generateRootFileSector() {
-    return new FileSector("Documents", [
+    let docs = new FileSector("Documents", [
         new Asset("June.doc"),
         new FileSector("January"),
         new Asset("November.doc"),
@@ -14,29 +14,18 @@ function generateRootFileSector() {
         new Asset("May.pdf"),
         new Asset("September.doc"),
         new Asset("October.png"),
-        new Asset("March.doc"),
+        new Asset("March.docx"),
         new Asset("August.png")
     ]);
+
+    return docs;
     
     /*
     return new FileSector("Root", [
         // apps tools installations addons extensions programs utilities modules
         new FileSector("Apps"),
         new FileSector("Desktop"),
-        new FileSector("Documents", [
-            new Asset("June.doc"),
-            new FileSector("January"),
-            new Asset("November.doc"),
-            new Asset("April.doc"),
-            new FileSector("July"),
-            new Asset("February.txt"),
-            new FileSector("December"),
-            new Asset("May.pdf"),
-            new Asset("September.doc"),
-            new Asset("October.png"),
-            new Asset("March.doc"),
-            new Asset("August.png")
-        ]),
+        docs,
         new FileSector("Downloads", []),
         new FileSector("Games"),
         new FileSector("Music", []),

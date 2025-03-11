@@ -16,7 +16,7 @@ export class Format {
         [ "exe" ]
     );
     static docFormat: Format = new Format("Word Document", "", 
-        [ "doc" ]
+        [ "doc", "docx" ]
     );
     static txtFormat: Format = new Format("Text", "", 
         [ "txt" ]
@@ -164,6 +164,10 @@ export class FileSector extends File {
     nameSize: number = 13;
     flow: Layout = $state(Layout.LandscapeColumns);
 
+    fileGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.files, this.groupedProperty));
+    assetGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.assets, this.groupedProperty));
+    sectorGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.sectors, this.groupedProperty));
+
     constructor(name: string, files: File[] = []) {
         super(name);
         this.trySetProperty("Format", Format.fileSectorFormat);
@@ -172,54 +176,6 @@ export class FileSector extends File {
         this.groupedProperty = "Format"; //TEMP
     }
 
-    fileGroups: FileGroup[] = $derived.by(() => {
-        let property = this.groupedProperty;
-
-        if (property === "") {
-            return [{propertyValue: "", files: this.files}];
-        }
-
-        let propVals = [...new Set(this.files.map(it => this.#propertyValueAsSortable(it.tryGetProperty(property))))].sort();
-        let filesPerPropVal = propVals.map(propVal => ({
-            propertyValue: propVal, 
-            files: this.files.filter(it => this.#propertyValueAsSortable(it.tryGetProperty(property)) === propVal)
-        }));
-        
-        return filesPerPropVal;
-    });
-
-    assetGroups: FileGroup[] = $derived.by(() => {
-        let property = this.groupedProperty;
-
-        if (property === "") {
-            return [{propertyValue: "", files: this.assets}];
-        }
-
-        let propVals = [...new Set(this.assets.map(it => it.tryGetProperty(property)))].sort();
-        let assetsPerPropVal = propVals.map(propVal => ({
-            propertyValue: propVal, 
-            files: this.assets.filter(it => it.tryGetProperty(property) === propVal)
-        }));
-        
-        return assetsPerPropVal;
-    });
-
-    sectorGroups: FileGroup[] = $derived.by(() => {
-        let property = this.groupedProperty;
-
-        if (property === "") {
-            return [{propertyValue: "", files: this.sectors}];
-        }
-
-        let propVals = [...new Set(this.sectors.map(it => it.tryGetProperty(property)))].sort();
-        let sectorsPerPropVal = propVals.map(propVal => ({
-            propertyValue: propVal, 
-            files: this.sectors.filter(it => it.tryGetProperty(property) === propVal)
-        }));
-        
-        return sectorsPerPropVal;
-    });
-    
     get files(): File[] {
         return [...this.#files];
     }
@@ -250,7 +206,34 @@ export class FileSector extends File {
         });
     }
 
-    #propertyValueAsSortable(val: any) {
+    #groupFilesByProperty<T extends File>(files: T[], property: any) {
+        if (property === "") {
+            return [{legiblePropertyValue: "", files: this.files} as FileGroup];
+        }
+
+        let newFileGroups: FileGroup[] = [];
+        
+        files.forEach(file => {
+            let file_legiblePropValue = this.#toLegible(file.tryGetProperty(property));
+            let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
+            if (fileGroup != null) {
+                fileGroup.files.push(file);
+            }
+            else {
+                newFileGroups.push({legiblePropertyValue: file_legiblePropValue, files: [file]});
+            }
+        });
+
+        newFileGroups.sort((a, b) => {
+            let aVal = a.legiblePropertyValue;
+            let bVal = b.legiblePropertyValue;
+            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        })
+        
+        return newFileGroups;
+    }
+
+    #toLegible(val: any) {
         if (typeof val === 'object') {
             if (val instanceof Format || val instanceof FileCategory || val instanceof File) {
                 return val.name;
@@ -276,6 +259,6 @@ export enum Layout {
 }
 
 export type FileGroup = {
-    propertyValue: any, 
+    legiblePropertyValue: any, 
     files: File[]
 }

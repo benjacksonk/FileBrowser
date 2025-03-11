@@ -5,11 +5,13 @@
 
     let {
         fileGroup,
+        showHeader,
         previewSize = 21,
         nameSize = 13,
         flow
     } : {
         fileGroup: FileGroup,
+        showHeader: boolean,
         previewSize: number,
         nameSize: number,
         flow: Layout
@@ -24,7 +26,7 @@
 
 <div class="FileGroupUI">
     <!-- {#if fileGroup.propertyValue !== "" && fileGroup.propertyValue != null} -->
-    <span class="groupHeader">{fileGroup.propertyValue}</span>
+    <span class="groupHeader">{fileGroup.legiblePropertyValue}</span>
     <!-- {/if} -->
 
     <div class="files"

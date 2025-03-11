@@ -23,23 +23,25 @@
     />
 
     <div class="fileSupergroup">
-        {#if browserState.splitSubsectors}
+        <!-- {#if browserState.splitSubsectors}
         <div class="fileGroups" style:grid-auto-flow={"row"}>
             {#each fileTreeState.sectorGroups as fileGroup}
             <FileGroupUI 
                 {fileGroup} 
+                showHeader={false}
                 previewSize={fileTreeState.previewSize} 
                 nameSize={fileTreeState.nameSize} 
                 flow={fileTreeState.flow}
             />
             {/each}
         </div>
-        {/if}
+        {/if} -->
         
         <div class="fileGroups" style:grid-auto-flow={isByRows ? "column" : "row"}>
-            {#each (browserState.splitSubsectors ? fileTreeState.assetGroups : fileTreeState.fileGroups) as fileGroup}
+            {#each (browserState.splitSubsectors ? fileTreeState.fileGroups/*assetGroups*/ : fileTreeState.fileGroups) as fileGroup}
             <FileGroupUI 
                 {fileGroup}
+                showHeader={fileTreeState.groupedProperty !== ""}
                 previewSize={fileTreeState.previewSize} 
                 nameSize={fileTreeState.nameSize} 
                 flow={fileTreeState.flow}
