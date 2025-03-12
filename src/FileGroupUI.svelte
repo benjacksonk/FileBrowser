@@ -8,23 +8,26 @@
         showHeader,
         previewSize = 21,
         nameSize = 13,
-        flow
+        layout
     } : {
         fileGroup: FileGroup,
         showHeader: boolean,
         previewSize: number,
         nameSize: number,
-        flow: Layout
+        layout: Layout
     } = $props();
 
-    let isByRows = $derived(flow === Layout.LandscapeRows || flow === Layout.PortraitRows);
-    let nameBelow = $derived(flow === Layout.PortraitColumns || flow === Layout.PortraitRows);
-    let detailsBelow = $derived(flow !== Layout.List);
+    let isByRows = $derived(layout === Layout.LandscapeRows || layout === Layout.PortraitRows);
+    let nameBelow = $derived(layout === Layout.PortraitColumns || layout === Layout.PortraitRows);
+    let detailsBelow = $derived(layout !== Layout.List);
 </script>
 
 
 
-<div class="FileGroupUI">
+<div class="FileGroupUI"
+    style:grid-row={isByRows ? "unset" : "1 / -1"}
+    style:grid-column={isByRows ? "1 / -1" : "unset"}
+>
     {#if showHeader}
     <span class="groupHeader">{fileGroup.legiblePropertyValue}</span>
     {/if}
@@ -32,11 +35,10 @@
     <div class="files"
         style:font-size={`${nameSize}px`}
         style:grid-auto-flow={isByRows ? "row" : "column"}
-        style:grid-template-columns={isByRows ? `repeat(auto-fill, minmax(0, calc(${previewSize}px + 10em)))` : "unset"}
-        style:grid-template-rows={isByRows ? "unset" : `repeat(auto-fill, ${previewSize}px)`}
+        style:grid-row={`${showHeader ? "2" : "1"} / -1`}
     >
-        {#each fileGroup.files as afile}
-        <FileUI {afile} {previewSize} {nameSize} {nameBelow} {detailsBelow} showFileExtension={browserState.showFileExtensions}/>
+        {#each fileGroup.files as file}
+        <FileUI {file} {previewSize} {nameSize} {nameBelow} {detailsBelow} showFileExtension={browserState.showFileExtensions}/>
         {/each}
     </div>
 </div>
@@ -47,11 +49,12 @@
     .FileGroupUI {
         width: 100%;
         height: 100%;
-        display: flex;
-        flex-flow: column nowrap;
+        display: grid;
+        grid-template: subgrid / subgrid;
     }
 
     .groupHeader {
+        grid-column: 1 / -1;
         height: 2lh;
         width: 100%;
         /* margin: 0 1em; */
@@ -59,12 +62,12 @@
     }
 
     .files {
+        grid-column: 1 / -1;
         width: 100%;
         height: 100%;
         display: grid;
+        grid-template: subgrid / subgrid;
         gap: 10px;
-        grid-auto-rows: max-content;
-        grid-auto-columns: max-content;
         align-content: start;
         justify-content: start;
     }

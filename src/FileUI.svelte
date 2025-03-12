@@ -2,14 +2,14 @@
     import { type File } from "$lib/types.svelte";
 
     let {
-        afile = $bindable(),
+        file: file = $bindable(),
         previewSize,
         nameSize,
         showFileExtension, 
         nameBelow, 
         detailsBelow
     } : {
-        afile: File,
+        file: File,
         previewSize: number,
         nameSize: number,
         showFileExtension: boolean, 
@@ -17,7 +17,7 @@
         detailsBelow: boolean
     } = $props();
 
-    let displayName = $derived(showFileExtension && afile.extension !== "" ? `${afile.name}.${afile.extension}` : afile.name);
+    let displayName = $derived(showFileExtension && file.extension !== "" ? `${file.name}.${file.extension}` : file.name);
 </script>
 
 
@@ -28,7 +28,7 @@
     style:align-items={"center"} 
     style:justify-items={nameBelow ? "center" : "start"}
 >
-    <img class="filePreview" alt="" src={afile.preview} style:height={`${previewSize}px`}>
+    <img class="filePreview" alt="" src={file.preview} style:height={`${previewSize}px`}>
 
     <div class="fileDescription" 
         style:flex-flow={`${detailsBelow ? "column" : "row"} nowrap`} 

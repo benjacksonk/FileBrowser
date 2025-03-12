@@ -162,7 +162,7 @@ export class FileSector extends File {
     groupedProperty: string = $state("");
     previewSize: number = 21;
     nameSize: number = 13;
-    flow: Layout = $state(Layout.LandscapeColumns);
+    layout: Layout = $state(Layout.LandscapeColumns);
 
     fileGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.files, this.groupedProperty));
     assetGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.assets, this.groupedProperty));
