@@ -1,43 +1,54 @@
 <script lang="ts">
-    import { Layout } from "$lib/types.svelte";
     import { browserState } from "$lib/browserState.svelte";
-    import { fileTreeState } from "$lib/fileTreeState.svelte";
+    import { DetailLayout } from "$lib/types.svelte";
     import FileBrowserConfig from "./FileBrowserConfig.svelte";
-    import FileSupergroup from "./FileSupergroup.svelte";
+    import FileCollectionUI from "./FileCollectionUI.svelte";
     import SectorViewConfig from "./SectorViewConfig.svelte";
 </script>
 
 
 
-<div class="Browser">
-    <div class="viewConfigs">
+<div class="Browser" style:grid-template-columns={browserState.splitSubsectors ? "max-content 1fr" : "unset"}>
+    <div class="browserConfig">
         <FileBrowserConfig 
+            bind:textSize={browserState.textSize}
             bind:splitSubsectors={browserState.splitSubsectors}
             bind:showFileExtensions={browserState.showFileExtensions}
         />
+    </div>
 
+    <div class="viewConfigs">
+        {#if browserState.splitSubsectors}
         <SectorViewConfig 
-            bind:groupedProperty={fileTreeState.groupedProperty}
-            bind:orderedProperty={fileTreeState.orderedProperty}
-            bind:flow={fileTreeState.layout}
+            bind:fileCollectionLayout={browserState.fileCollectionLayout}
+        />
+        {/if}
+    
+        <SectorViewConfig 
+            bind:fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
+            bind:fileSector={browserState.rootFileSector}
         />
     </div>
 
     <div class="sectorContents">
         {#if browserState.splitSubsectors}
-        <FileSupergroup
-            fileGroups={fileTreeState.sectorGroups}
-            showHeaders={false}
-            layout={Layout.LandscapeColumns}
+        <FileCollectionUI
+            fileGroups={browserState.rootFileSector.sectorGroups}
+            fileCollectionLayout={browserState.fileCollectionLayout}
+            detailLayout={DetailLayout.Beside}
+            inRows={false}
+            nameSize={browserState.textSize}
+            showHeaders={browserState.fileCollectionLayout.groupedProperty !== ""}
         />
         {/if}
         
-        <FileSupergroup 
-            fileGroups={browserState.splitSubsectors ? fileTreeState.assetGroups : fileTreeState.fileGroups}
-            bind:previewSize={fileTreeState.previewSize}
-            bind:nameSize={fileTreeState.nameSize}
-            showHeaders={fileTreeState.groupedProperty !== ""}
-            layout={fileTreeState.layout}
+        <FileCollectionUI 
+            fileGroups={browserState.splitSubsectors ? browserState.rootFileSector.assetGroups : browserState.rootFileSector.fileGroups}
+            fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
+            detailLayout={browserState.rootFileSector.detailLayout}
+            inRows={browserState.rootFileSector.inRows}
+            nameSize={browserState.textSize}
+            showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty !== ""}
         />
     </div>
 </div>
@@ -51,25 +62,35 @@
         background-color: var(--color-key-10);
         color: white;
         display: grid;
-        grid-template-rows: max-content 1fr;
+        grid-auto-flow: row;
+        grid-template-rows: max-content max-content;
+        grid-auto-rows: 1fr;
+        grid-auto-columns: 1fr;
+    }
+
+    .browserConfig {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-auto-flow: row;
+        grid-template-rows: max-content;
+        grid-auto-columns: minmax(0, 1fr); 
     }
 
     .viewConfigs {
+        grid-column: 1 / -1;
         padding: 20px;
         gap: 0.4em 4em;
         display: grid;
-        grid-auto-flow: row;
-        grid-template: repeat(3, 1fr) / repeat(2, max-content);
+        grid-template: subgrid / subgrid;
         border-bottom: 1px solid var(--color-key-7);
     }
 
     .sectorContents {
+        grid-column: 1 / -1;
         width: 100%;
         height: 100%;
         padding: 20px;
         display: grid;
-        grid-auto-flow: column;
-        grid-template-columns: minmax(0,1fr);
-        grid-auto-columns: minmax(0,2fr);
+        grid-template: subgrid / subgrid;
     }
 </style>

@@ -1,37 +1,64 @@
 export class Format {
+    // Property Strings
+    static propertyKeyForName: string = "Name";
+    static propertyKeyForExtension: string = "Extension";
+    static propertyKeyForFormat: string = "Format";
+    static propertyKeyForSize: string = "Size";
+    static propertyKeyForImageWidth: string = "Image Width (px)";
+    static propertyKeyForImageHeight: string = "Image Height (px)";
+    //
+
     static #categoryPerFormat: Map<Format, string> = new Map<Format, string>();
 
-    static defaultProperties: string[] = [ "Name", "Extension", "Format", "Size"];
+    static defaultProperties: string[] = [
+        Format.propertyKeyForName, 
+        Format.propertyKeyForExtension, 
+        Format.propertyKeyForFormat, 
+        Format.propertyKeyForSize
+    ];
+
     static perExtension: Map<string, Format> = new Map<string, Format>();
     static formats: Set<Format> = new Set<Format>();
 
     static unspecifiedFormat: Format = new Format("Unspecified");
     static fileSectorFormat: Format = new Format("File Sector");
-    static pngFormat: Format = new Format("Portable Network Graphics", "", 
-        [ "png" ], [
-        "Image Width (px)",
-        "Image Height (px)"
-    ]);
-    static exeFormat: Format = new Format("Executable", "", 
+    static pngFormat: Format = new Format(
+        "Portable Network Graphics", 
+        "", 
+        [ "png" ], 
+        [
+            Format.propertyKeyForImageWidth,
+            Format.propertyKeyForImageHeight
+        ]
+    );
+    static exeFormat: Format = new Format(
+        "Executable", 
+        "", 
         [ "exe" ]
     );
-    static docFormat: Format = new Format("Word Document", "", 
+    static docFormat: Format = new Format(
+        "Word Document", 
+        "", 
         [ "doc", "docx" ]
     );
-    static txtFormat: Format = new Format("Text", "", 
+    static txtFormat: Format = new Format(
+        "Text", 
+        "", 
         [ "txt" ]
     );
-    static pdfFormat: Format = new Format("Adobe Portable Document Format", "", 
+    static pdfFormat: Format = new Format(
+        "Adobe Portable Document Format", 
+        "", 
         [ "pdf" ]
     );
 
     static defaultsPerProperty: Map<string, any> = new Map<string, any>([
-        ["Name", ""],
-        ["Extension", ""],
-        ["Format", Format.unspecifiedFormat],
-        ["Size", 0],
-        ["Image Width (px)", 0],
-        ["Image Height (px)", 0]
+        [Format.propertyKeyForName, ""],
+        [Format.propertyKeyForExtension, ""],
+        [Format.propertyKeyForFormat, Format.unspecifiedFormat],
+        [Format.propertyKeyForSize, 0],
+        [Format.propertyKeyForImageWidth, 0],
+        [Format.propertyKeyForImageHeight, 0]
     ]);
 
     static getFileTypeByName(formatName: string): Format {
@@ -72,11 +99,11 @@ export abstract class File {
         if (nameWithExtension.includes(".") && !nameWithExtension.endsWith(".")) {
             let nameParts = nameWithExtension.split(".");
             let extension = nameParts.pop() as string;
-            this.trySetProperty("Extension", extension);
-            this.trySetProperty("Name", nameParts.join("."));
+            this.trySetProperty(Format.propertyKeyForExtension, extension);
+            this.trySetProperty(Format.propertyKeyForName, nameParts.join("."));
         }
         else {
-            this.trySetProperty("Name", nameWithExtension);
+            this.trySetProperty(Format.propertyKeyForName, nameWithExtension);
         }
     }
     
@@ -96,10 +123,10 @@ export abstract class File {
 
         this.valuesPerProperty.set(propertyName, value);
 
-        if (propertyName === "Extension") {
-            this.trySetProperty("Format", Format.getFileTypeByExtension(value));
+        if (propertyName === Format.propertyKeyForExtension) {
+            this.trySetProperty(Format.propertyKeyForFormat, Format.getFileTypeByExtension(value));
         }
-        else if (propertyName === "Format") {
+        else if (propertyName === Format.propertyKeyForFormat) {
             let newFormat = value as Format;
             let mandatedProperties = newFormat.properties;
             let oldProperties = [...this.valuesPerProperty.keys()];
@@ -114,31 +141,31 @@ export abstract class File {
     }
     
     get name(): string {
-        return this.tryGetProperty("Name");
+        return this.tryGetProperty(Format.propertyKeyForName);
     }
     set name(newName: string) {
-        this.trySetProperty("Name", newName);
+        this.trySetProperty(Format.propertyKeyForName, newName);
     }
 
     get extension(): string {
-        return this.tryGetProperty("Extension");
+        return this.tryGetProperty(Format.propertyKeyForExtension);
     }
     set extension(newExtension: string) {
-        this.trySetProperty("Extension", newExtension);
+        this.trySetProperty(Format.propertyKeyForExtension, newExtension);
     }
     
     get format(): Format {
-        return this.tryGetProperty("Format");
+        return this.tryGetProperty(Format.propertyKeyForFormat);
     }
     set format(newFormat: Format) {
-        this.trySetProperty("Format", newFormat);
+        this.trySetProperty(Format.propertyKeyForFormat, newFormat);
     }
     
     get fileSize(): number {
-        return this.tryGetProperty("Size");
+        return this.tryGetProperty(Format.propertyKeyForSize);
     }
     set fileSize(newFileSize: number) {
-        this.trySetProperty("Size", newFileSize);
+        this.trySetProperty(Format.propertyKeyForSize, newFileSize);
     }
 }
 
@@ -157,12 +184,10 @@ export class Asset /* or "Artifact" ? */ extends File {
 
 export class FileSector extends File {
     #files: File[] = $state([]);
-    #orderedProperty: string = $state("");
+    #fileCollectionLayout: FileCollectionLayout = $state(new FileCollectionLayout());
 
-    groupedProperty: string = $state("");
-    previewSize: number = 21;
-    nameSize: number = 13;
-    layout: Layout = $state(Layout.LandscapeColumns);
+    detailLayout: DetailLayout = $state(DetailLayout.Beside);
+    inRows: boolean = $state(false);
 
     fileGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.files, this.groupedProperty));
     assetGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.assets, this.groupedProperty));
@@ -170,10 +195,9 @@ export class FileSector extends File {
 
     constructor(name: string, files: File[] = []) {
         super(name);
-        this.trySetProperty("Format", Format.fileSectorFormat);
+        this.trySetProperty(Format.propertyKeyForFormat, Format.fileSectorFormat);
         this.#files = files;
-        this.orderedProperty = "Name";
-        this.groupedProperty = "Format"; //TEMP
+        this.#fileCollectionLayout = new FileCollectionLayout(files);
     }
 
     get files(): File[] {
@@ -188,22 +212,8 @@ export class FileSector extends File {
         return this.#files.filter(it => it instanceof FileSector);
     }
 
-    get orderedProperty(): string {
-        return this.#orderedProperty;
-    }
-    set orderedProperty(newProperty: string) {
-        this.#orderedProperty = newProperty;
-
-        this.#files.sort((fileA: File, fileB: File): number => {
-            let orderedProperty = newProperty;
-            let propertyA = fileA.tryGetProperty(orderedProperty);
-            let propertyB = fileB.tryGetProperty(orderedProperty);
-            if (orderedProperty === "Format") {
-                propertyA = propertyA.name;
-                propertyB = propertyB.name;
-            }
-            return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
-        });
+    get fileCollectionLayout(): FileCollectionLayout {
+        return this.#fileCollectionLayout;
     }
 
     #groupFilesByProperty<T extends File>(files: T[], property: any) {
@@ -211,26 +221,26 @@ export class FileSector extends File {
             return [{legiblePropertyValue: "", files: this.files} as FileGroup];
         }
 
-        let newFileGroups: FileGroup[] = [];
+        let newFileSorts: FileGroup[] = [];
         
         files.forEach(file => {
             let file_legiblePropValue = this.#toLegible(file.tryGetProperty(property));
-            let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
-            if (fileGroup != null) {
-                fileGroup.files.push(file);
+            let fileSort = newFileSorts.find(it => it.legiblePropertyValue === file_legiblePropValue);
+            if (fileSort != null) {
+                fileSort.files.push(file);
             }
             else {
-                newFileGroups.push({legiblePropertyValue: file_legiblePropValue, files: [file]});
+                newFileSorts.push({legiblePropertyValue: file_legiblePropValue, files: [file]});
             }
         });
 
-        newFileGroups.sort((a, b) => {
+        newFileSorts.sort((a, b) => {
             let aVal = a.legiblePropertyValue;
             let bVal = b.legiblePropertyValue;
             return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
         })
         
-        return newFileGroups;
+        return newFileSorts;
     }
 
     #toLegible(val: any) {
@@ -250,12 +260,42 @@ export class FileCategory {
     name: string = "";
 }
 
-export enum Layout {
-    List ="List",
-    PortraitColumns = "Portrait Columns",
-    LandscapeColumns = "Landscape Columns",
-    PortraitRows = "Portrait Rows",
-    LandscapeRows = "Landscape Rows"
+export class FileCollectionLayout {
+    #files: File[] = $state([]);
+    
+    previewSize: number = $state(21);
+    groupedProperty: string = $state("");
+    #orderedProperty: string = $state("");
+
+    constructor(files: File[] = []) {
+        this.#orderedProperty = Format.propertyKeyForName;
+        this.groupedProperty = Format.propertyKeyForFormat; //TEMP
+    }
+
+    get orderedProperty(): string {
+        return this.#orderedProperty;
+    }
+    set orderedProperty(newProperty: string) {
+        this.#orderedProperty = newProperty;
+
+        this.#files.sort((fileA: File, fileB: File): number => {
+            let orderedProperty = newProperty;
+            let propertyA = fileA.tryGetProperty(orderedProperty);
+            let propertyB = fileB.tryGetProperty(orderedProperty);
+            if (orderedProperty === Format.propertyKeyForFormat) {
+                propertyA = propertyA.name;
+                propertyB = propertyB.name;
+            }
+            return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
+        });
+    }
+} // detailFlow, inRows
+
+// Detail Info Properties
+export enum DetailLayout {
+    Below = "Below",
+    Beside = "Beside",
+    Tabular = "Tabular",
 }
 
 export type FileGroup = {

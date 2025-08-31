@@ -1,8 +1,10 @@
 <script lang="ts">
     let {
+        textSize = $bindable(13),
         splitSubsectors = $bindable(true),
         showFileExtensions = $bindable(true)
     } : {
+        textSize: number,
         splitSubsectors: boolean,
         showFileExtensions: boolean
     } = $props();
@@ -11,6 +13,11 @@
 
 
 <div class="FileBrowserConfig">
+    <label>
+        <input type="range" bind:value={textSize}/>
+        <span>Text Size: {textSize}</span>
+    </label>
+
     <label>
         <input type="checkbox" name="splitSubsectors" bind:checked={splitSubsectors}/>
         Split Sectors
@@ -26,12 +33,11 @@
 
 <style>
     .FileBrowserConfig {
-        width: fit-content;
-        grid-row: 1 / -1;
-        display: grid;
-        grid-auto-flow: column;
-        grid-template-rows: subgrid;
-        grid-template-columns: subgrid;
+        width: 100%;
+        height: fit-content;
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 60px;
         text-wrap: nowrap;
     }
 

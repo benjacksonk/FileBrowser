@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Layout, type FileGroup } from "$lib/types.svelte";
+    import { DetailLayout, type FileGroup } from "$lib/types.svelte";
     import { browserState } from "$lib/browserState.svelte";
     import FileUI from "./FileUI.svelte";
 
@@ -8,37 +8,40 @@
         showHeader,
         previewSize = 21,
         nameSize = 13,
-        layout
+        detailLayout = DetailLayout.Beside,
+        inRows = false
     } : {
         fileGroup: FileGroup,
         showHeader: boolean,
         previewSize: number,
         nameSize: number,
-        layout: Layout
+        detailLayout: DetailLayout,
+        inRows: boolean
     } = $props();
-
-    let isByRows = $derived(layout === Layout.LandscapeRows || layout === Layout.PortraitRows);
-    let nameBelow = $derived(layout === Layout.PortraitColumns || layout === Layout.PortraitRows);
-    let detailsBelow = $derived(layout !== Layout.List);
 </script>
 
 
 
 <div class="FileGroupUI"
-    style:grid-row={isByRows ? "unset" : "1 / -1"}
-    style:grid-column={isByRows ? "1 / -1" : "unset"}
+style:grid-row={inRows ? "unset" : "1 / -1"}
+style:grid-column={inRows ? "1 / -1" : "unset"}
+style:width={inRows ? "100%" : "fit-content"}
+style:height={inRows ? "fit-content" : "100%"}
+style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
 >
     {#if showHeader}
-    <span class="groupHeader">{fileGroup.legiblePropertyValue}</span>
+    <div class="groupHeader">
+        <span class="headerText">{fileGroup.legiblePropertyValue}</span>
+    </div>
     {/if}
 
     <div class="files"
-        style:font-size={`${nameSize}px`}
-        style:grid-auto-flow={isByRows ? "row" : "column"}
-        style:grid-row={`${showHeader ? "2" : "1"} / -1`}
+    style:grid-row={inRows ? "unset" : `${showHeader ? "2" : "1"} / -1`}
+    style:font-size={`${nameSize}px`}
+    style:grid-auto-flow={inRows ? "row" : "column"}
     >
         {#each fileGroup.files as file}
-        <FileUI {file} {previewSize} {nameSize} {nameBelow} {detailsBelow} showFileExtension={browserState.showFileExtensions}/>
+        <FileUI {file} {previewSize} {nameSize} {detailLayout} showFileExtension={browserState.showFileExtensions}/>
         {/each}
     </div>
 </div>
@@ -47,18 +50,26 @@
 
 <style>
     .FileGroupUI {
-        width: 100%;
-        height: 100%;
         display: grid;
-        grid-template: subgrid / subgrid;
+        grid-auto-flow: column;
+        /* padding: 1em; */
     }
 
     .groupHeader {
         grid-column: 1 / -1;
-        height: 2lh;
         width: 100%;
-        /* margin: 0 1em; */
         border-bottom: 1px solid var(--color-grey-4);
+        margin-bottom: 1.618ch;
+
+        display: grid;
+        grid-auto-flow: row;
+        grid-template-rows: subgrid;
+        grid-template-columns: auto 1fr;
+    }
+
+    .headerText {
+        text-wrap: nowrap;
+        padding-bottom: 0.618ch;
     }
 
     .files {
@@ -67,8 +78,5 @@
         height: 100%;
         display: grid;
         grid-template: subgrid / subgrid;
-        gap: 10px;
-        align-content: start;
-        justify-content: start;
     }
 </style>

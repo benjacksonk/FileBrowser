@@ -1,22 +1,21 @@
 <script lang="ts">
-    import { type File } from "$lib/types.svelte";
+    import { DetailLayout, type File } from "$lib/types.svelte";
 
     let {
         file: file = $bindable(),
         previewSize,
         nameSize,
         showFileExtension, 
-        nameBelow, 
-        detailsBelow
+        detailLayout
     } : {
         file: File,
         previewSize: number,
         nameSize: number,
         showFileExtension: boolean, 
-        nameBelow: boolean, 
-        detailsBelow: boolean
+        detailLayout: DetailLayout
     } = $props();
 
+    let textBelow = $derived(detailLayout === DetailLayout.Below);
     let displayName = $derived(showFileExtension && file.extension !== "" ? `${file.name}.${file.extension}` : file.name);
 </script>
 
@@ -24,16 +23,16 @@
 
 <div class="FileUI" 
     style:gap={`${previewSize * (Math.sqrt(2) - 1)}px`} 
-    style:flex-flow={`${nameBelow ? "column" : "row"} nowrap`} 
+    style:flex-flow={textBelow ? "column" : "row"}
     style:align-items={"center"} 
-    style:justify-items={nameBelow ? "center" : "start"}
+    style:justify-items={textBelow ? "start" : "center"}
 >
     <img class="filePreview" alt="" src={file.preview} style:height={`${previewSize}px`}>
 
     <div class="fileDescription" 
-        style:flex-flow={`${detailsBelow ? "column" : "row"} nowrap`} 
-        style:align-items={detailsBelow ? "center" : "start"} 
-        style:justify-items={detailsBelow ? "start" : "center"}
+        style:flex-flow={`${textBelow ? "column" : "row"} nowrap`} 
+        style:align-items={textBelow ? "center" : "start"} 
+        style:justify-items={textBelow ? "start" : "center"}
     >
         <span class="fileName" style:font-size={`${nameSize}px`}>{displayName}</span>
     </div>
@@ -43,11 +42,10 @@
 
 <style>
     .FileUI {
-        width: fit-content;
+        width: 100%;
         height: fit-content;
         display: flex;
-
-        background-color: #345;
+        /* padding: 0.4em; */
     }
 
     .filePreview {
@@ -55,6 +53,12 @@
     }
 
     .fileDescription {
+        width: max-content;
         display: flex;
+    }
+
+    .fileName {
+        width: max-content;
+        text-wrap: nowrap;
     }
 </style>
