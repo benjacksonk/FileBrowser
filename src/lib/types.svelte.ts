@@ -189,9 +189,9 @@ export class FileSector extends File {
     detailLayout: DetailLayout = $state(DetailLayout.Beside);
     inRows: boolean = $state(false);
 
-    fileGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.files, this.groupedProperty));
-    assetGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.assets, this.groupedProperty));
-    sectorGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.sectors, this.groupedProperty));
+    fileGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.files, this.#fileCollectionLayout.groupedProperty));
+    assetGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.assets, this.#fileCollectionLayout.groupedProperty));
+    sectorGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.sectors, this.#fileCollectionLayout.groupedProperty));
 
     constructor(name: string, files: File[] = []) {
         super(name);
