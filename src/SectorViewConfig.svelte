@@ -64,19 +64,21 @@
 
 <style>
     .SectorViewConfig {
-        /* grid-row: 1 / -1; */
         width: 100%;
-        height: max-content;
+        display: grid;
         
-        display: flex;
-        flex-flow: row nowrap;
+        grid-auto-flow: column;
+        grid-auto-rows: max-content;
+        grid-auto-columns: max-content;
     }
 
     .sectorViewConfigColumn {
-        width: max-content;
-        display: flex;
-        flex-flow: column nowrap;
-        gap: 8px;
+        display: grid;
+        
+        grid-auto-flow: row;
+        grid-template-columns: subgrid;
+        grid-auto-rows: max-content;
+        gap: 8px 13px;
         padding: 8px 13px;
 
         &:not(:first-of-type) {
@@ -86,18 +88,17 @@
     }
 
     label {
-        /* grid-column: 1 / -1;
-
-        display: grid;
-        gap: 0 0.6em;
-        grid-auto-flow: row;
-        grid-template-columns: subgrid;
-        grid-auto-rows: max-content;
+        width: fit-content;
+        height: max-content;
         text-wrap: nowrap;
-        align-items: center; */
+        display: flex;
+
+        flex-flow: row nowrap;
+        gap: 0.6em;
+        align-items: center;
     }
 
-    select {
+    /* select {
         padding: 0 0.4em;
-    }
+    } */
 </style>

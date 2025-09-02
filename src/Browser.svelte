@@ -16,40 +16,40 @@
             bind:showFileExtensions={browserState.showFileExtensions}
         />
     </div>
-
-    <div class="viewConfigs">
-        {#if browserState.splitSubsectors}
-        <SectorViewConfig 
-            bind:fileCollectionLayout={browserState.fileCollectionLayout}
-        />
-        {/if}
     
-        <SectorViewConfig 
-            bind:fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
-            bind:fileSector={browserState.rootFileSector}
-        />
-    </div>
-
-    <div class="sectorContents">
+    <div class="filePanes">
         {#if browserState.splitSubsectors}
-        <FileCollectionUI
-            fileGroups={browserState.rootFileSector.sectorGroups}
-            fileCollectionLayout={browserState.fileCollectionLayout}
-            detailLayout={DetailLayout.Beside}
-            inRows={false}
-            nameSize={browserState.textSize}
-            showHeaders={browserState.fileCollectionLayout.groupedProperty !== ""}
-        />
+        <div class="sectorPane filePane">
+            <SectorViewConfig 
+                bind:fileCollectionLayout={browserState.fileCollectionLayout}
+            />
+            
+            <FileCollectionUI
+                fileGroups={browserState.rootFileSector.sectorGroups}
+                fileCollectionLayout={browserState.fileCollectionLayout}
+                detailLayout={DetailLayout.Beside}
+                inRows={false}
+                nameSize={browserState.textSize}
+                showHeaders={browserState.fileCollectionLayout.groupedProperty !== ""}
+            />
+        </div>
         {/if}
-        
-        <FileCollectionUI 
-            fileGroups={browserState.splitSubsectors ? browserState.rootFileSector.assetGroups : browserState.rootFileSector.fileGroups}
-            fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
-            detailLayout={browserState.rootFileSector.detailLayout}
-            inRows={browserState.rootFileSector.inRows}
-            nameSize={browserState.textSize}
-            showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty !== ""}
-        />
+
+        <div class="filePane">
+            <SectorViewConfig 
+                bind:fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
+                bind:fileSector={browserState.rootFileSector}
+            />
+            
+            <FileCollectionUI 
+                fileGroups={browserState.splitSubsectors ? browserState.rootFileSector.assetGroups : browserState.rootFileSector.fileGroups}
+                fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
+                detailLayout={browserState.rootFileSector.detailLayout}
+                inRows={browserState.rootFileSector.inRows}
+                nameSize={browserState.textSize}
+                showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty !== ""}
+            />
+        </div>
     </div>
 </div>
 
@@ -62,35 +62,42 @@
         background-color: var(--color-key-10);
         color: white;
         display: grid;
+
         grid-auto-flow: row;
-        grid-template-rows: max-content max-content;
-        grid-auto-rows: 1fr;
-        grid-auto-columns: 1fr;
+        grid-template-rows: repeat(2, max-content);
+        grid-template-columns: max-content;
+        justify-content: stretch;
+        align-content: stretch;
     }
 
     .browserConfig {
         grid-column: 1 / -1;
+        border-bottom: 1px solid #555;
         display: grid;
+
+        grid-template: subgrid / subgrid;
+    }
+
+    .filePanes {
+        grid-row: span 2;
+        grid-column: 1 / -1;
+        display: grid;
+        
+        grid-template: subgrid / subgrid;
+        grid-auto-flow: column;
+    }
+    
+    .filePane {
+        grid-row: span 2;
+        display: grid;
+
         grid-auto-flow: row;
-        grid-template-rows: max-content;
-        grid-auto-columns: minmax(0, 1fr); 
-    }
-
-    .viewConfigs {
-        grid-column: 1 / -1;
-        padding: 20px;
-        gap: 0.4em 4em;
-        display: grid;
         grid-template: subgrid / subgrid;
-        border-bottom: 1px solid var(--color-key-7);
-    }
+        gap: 8px 13px;
 
-    .sectorContents {
-        grid-column: 1 / -1;
-        width: 100%;
-        height: 100%;
-        padding: 20px;
-        display: grid;
-        grid-template: subgrid / subgrid;
+        &:not(:first-of-type) {
+            box-sizing: content-box;
+            border-left: 1px solid #555;
+        }
     }
 </style>

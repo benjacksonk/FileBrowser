@@ -50,9 +50,10 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
 
 <style>
     .FileGroupUI {
-        display: grid;
-        grid-auto-flow: column;
         /* padding: 1em; */
+        display: grid;
+
+        grid-auto-flow: column;
     }
 
     .groupHeader {
@@ -60,8 +61,8 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
         width: 100%;
         border-bottom: 1px solid var(--color-grey-4);
         margin-bottom: 1.618ch;
-
         display: grid;
+
         grid-auto-flow: row;
         grid-template-rows: subgrid;
         grid-template-columns: auto 1fr;
@@ -77,6 +78,8 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
         width: 100%;
         height: 100%;
         display: grid;
+
         grid-template: subgrid / subgrid;
+        gap: 8px 13px;
     }
 </style>

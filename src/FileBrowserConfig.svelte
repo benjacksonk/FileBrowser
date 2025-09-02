@@ -33,18 +33,27 @@
 
 <style>
     .FileBrowserConfig {
+        grid-column: 1 / -1;
         width: 100%;
-        height: fit-content;
-        display: flex;
-        flex-flow: row nowrap;
-        gap: 60px;
+        height: max-content;
+        padding: 8px 13px;
         text-wrap: nowrap;
+        display: grid;
+
+        grid-auto-flow: column;
+        grid-auto-rows: max-content;
+        grid-auto-columns: max-content;
+        gap: 60px;
     }
 
     label {
-        gap: 0.6em;
+        width: fit-content;
+        height: max-content;
+        text-wrap: nowrap;
         display: flex;
+        
         flex-flow: row nowrap;
+        gap: 0.6em;
         align-items: center;
     }
 </style>

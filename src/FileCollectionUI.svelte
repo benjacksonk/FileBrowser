@@ -24,12 +24,13 @@
 
 
 <div class="FileCollectionUI">
-    <div class="fileGroups" style:grid-auto-flow={inRows ? "column" : "row"}>
+    <div class="fileGroups" 
+    style:grid-auto-flow={inRows ? "column" : "row"}
+    style:gap={inRows ? "13px 0px" : "0px 13px"}
+    >
         {#each fileGroups as fileGroup}
         <FileGroupUI {fileGroup} showHeader={showHeaders} {previewSize} {nameSize} {detailLayout} {inRows}/>
         {/each}
-    
-        <!-- <div class="filr"><div>a</div></div> -->
     </div>
 </div>
 
@@ -40,6 +41,8 @@
         width: 100%;
         height: 100%;
         display: grid;
+        
+        padding: 8px 13px;
         grid-template-rows: repeat(2, max-content) 1fr;
     }
 
