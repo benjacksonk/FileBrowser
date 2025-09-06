@@ -36,14 +36,14 @@
         grid-column: 1 / -1;
         width: 100%;
         height: max-content;
-        padding: 8px 13px;
+        padding: var(--space-4) var(--space-5);
         text-wrap: nowrap;
         display: grid;
 
         grid-auto-flow: column;
         grid-auto-rows: max-content;
         grid-auto-columns: max-content;
-        gap: 60px;
+        gap: var(--space-9);
     }
 
     label {
@@ -53,7 +53,7 @@
         display: flex;
         
         flex-flow: row nowrap;
-        gap: 0.6em;
+        gap: var(--space-4);
         align-items: center;
     }
 </style>

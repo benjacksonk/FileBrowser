@@ -9,14 +9,16 @@
         previewSize = 21,
         nameSize = 13,
         detailLayout = DetailLayout.Beside,
-        inRows = false
+        inRows = false,
+        isFirstGroup = false
     } : {
         fileGroup: FileGroup,
         showHeader: boolean,
         previewSize: number,
         nameSize: number,
         detailLayout: DetailLayout,
-        inRows: boolean
+        inRows: boolean,
+        isFirstGroup: boolean
     } = $props();
 </script>
 
@@ -28,6 +30,8 @@ style:grid-column={inRows ? "1 / -1" : "unset"}
 style:width={inRows ? "100%" : "fit-content"}
 style:height={inRows ? "fit-content" : "100%"}
 style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
+style:border-top-width={(inRows && !isFirstGroup) ? "1px" : "0"}
+style:border-left-width={(!inRows && !isFirstGroup) ? "1px" : "0"}
 >
     {#if showHeader}
     <div class="groupHeader">
@@ -50,7 +54,8 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
 
 <style>
     .FileGroupUI {
-        /* padding: 1em; */
+        padding: var(--space-4) var(--space-5);
+        border: 0 solid var(--gray-7);
         display: grid;
 
         grid-auto-flow: column;
@@ -59,8 +64,9 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
     .groupHeader {
         grid-column: 1 / -1;
         width: 100%;
-        border-bottom: 1px solid var(--color-grey-4);
-        margin-bottom: 1.618ch;
+        margin-bottom: 1cap;
+        color: var(--gray-0);
+        font-weight: 500;
         display: grid;
 
         grid-auto-flow: row;
@@ -70,7 +76,7 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
 
     .headerText {
         text-wrap: nowrap;
-        padding-bottom: 0.618ch;
+        padding-bottom: 0.618cap;
     }
 
     .files {
@@ -80,6 +86,6 @@ style:grid-template={`${inRows ? "auto" : "subgrid"} / subgrid`}
         display: grid;
 
         grid-template: subgrid / subgrid;
-        gap: 8px 13px;
+        gap: var(--space-3) var(--space-4);
     }
 </style>

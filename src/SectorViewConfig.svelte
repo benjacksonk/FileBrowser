@@ -65,11 +65,13 @@
 <style>
     .SectorViewConfig {
         width: 100%;
+        padding: var(--space-4) var(--space-5);
         display: grid;
         
         grid-auto-flow: column;
         grid-auto-rows: max-content;
         grid-auto-columns: max-content;
+        column-gap: var(--space-9);
     }
 
     .sectorViewConfigColumn {
@@ -78,13 +80,7 @@
         grid-auto-flow: row;
         grid-template-columns: subgrid;
         grid-auto-rows: max-content;
-        gap: 8px 13px;
-        padding: 8px 13px;
-
-        &:not(:first-of-type) {
-            box-sizing: content-box;
-            border-left: 1px solid #555;
-        }
+        row-gap: var(--space-4);
     }
 
     label {
@@ -97,8 +93,4 @@
         gap: 0.6em;
         align-items: center;
     }
-
-    /* select {
-        padding: 0 0.4em;
-    } */
 </style>

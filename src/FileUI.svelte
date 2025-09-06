@@ -16,25 +16,26 @@
     } = $props();
 
     let textBelow = $derived(detailLayout === DetailLayout.Below);
-    let displayName = $derived(showFileExtension && file.extension !== "" ? `${file.name}.${file.extension}` : file.name);
 </script>
 
 
 
 <div class="FileUI" 
-    style:gap={`${previewSize * (Math.sqrt(2) - 1)}px`} 
+    style:gap={`${(Math.sqrt(Math.max(nameSize, previewSize)))}px ${(2 * Math.sqrt(Math.max(nameSize, previewSize)))}px`} 
     style:flex-flow={textBelow ? "column" : "row"}
     style:align-items={"center"} 
     style:justify-items={textBelow ? "start" : "center"}
 >
     <img class="filePreview" alt="" src={file.preview} style:height={`${previewSize}px`}>
 
-    <div class="fileDescription" 
+    <div class="fileDescription" style:font-size={`${nameSize}px`} 
         style:flex-flow={`${textBelow ? "column" : "row"} nowrap`} 
         style:align-items={textBelow ? "center" : "start"} 
         style:justify-items={textBelow ? "start" : "center"}
     >
-        <span class="fileName" style:font-size={`${nameSize}px`}>{displayName}</span>
+        <span class="fileName">
+            {file.name}{#if showFileExtension && (file.extension != "")}<span class="extension">{`.${file.extension}`}</span>{/if}
+        </span>
     </div>
 </div>
 
@@ -60,5 +61,11 @@
     .fileName {
         width: max-content;
         text-wrap: nowrap;
+        font-size: inherit;
+
+        > .extension {
+            font-size: inherit;
+            color: var(--gray-3);
+        }
     }
 </style>

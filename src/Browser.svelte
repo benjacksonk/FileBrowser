@@ -59,7 +59,7 @@
     .Browser {
         width: 100%;
         height: 100%;
-        background-color: var(--color-key-10);
+        background-color: var(--gray-9);
         color: white;
         display: grid;
 
@@ -72,7 +72,7 @@
 
     .browserConfig {
         grid-column: 1 / -1;
-        border-bottom: 1px solid #555;
+        border-bottom: 1px solid var(--gray-7);
         display: grid;
 
         grid-template: subgrid / subgrid;
@@ -97,7 +97,7 @@
 
         &:not(:first-of-type) {
             box-sizing: content-box;
-            border-left: 1px solid #555;
+            border-left: 1px solid var(--gray-7);
         }
     }
 </style>
