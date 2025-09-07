@@ -90,6 +90,10 @@ export class Format {
     static getFileTypePerExtension(extension: string): Format {
         return Format.perExtension.get(extension) || Format.unspecifiedFormat;
     }
+
+    toString(): string {
+        return this.name;
+    }
 }
 
 export abstract class File {
@@ -140,6 +144,20 @@ export abstract class File {
         return true;
     }
     
+    getProperties(): Array<{key: string, value: any}> {
+        return this.valuesPerProperty.entries().toArray().map(entry => ({
+            key: entry[0],
+            value: entry[1]
+        }));
+    }
+
+    getPropertiesByKeys(keys: Array<string>): Array<{key: string, value: any}> {
+        return keys.map(key => ({
+            key: key,
+            value: this.tryGetProperty(key)
+        }));
+    }
+
     get name(): string {
         return this.tryGetProperty(Format.propertyKeyForName);
     }
@@ -166,6 +184,10 @@ export abstract class File {
     }
     set fileSize(newFileSize: number) {
         this.trySetProperty(Format.propertyKeyForSize, newFileSize);
+    }
+
+    toString(): string {
+        return this.name;
     }
 }
 
@@ -258,6 +280,10 @@ export class FileSector extends File {
 
 export class FileCategory {
     name: string = "";
+
+    toString(): string {
+        return this.name;
+    }
 }
 
 export class FileCollectionLayout {

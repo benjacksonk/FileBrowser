@@ -55,7 +55,7 @@ style:border-left-width={(!inRows && !isFirstGroup) ? "1px" : "0"}
 <style>
     .FileGroupUI {
         padding: var(--space-4) var(--space-5);
-        border: 0 solid var(--gray-7);
+        border: 0 solid var(--gray-8);
         display: grid;
 
         grid-auto-flow: column;

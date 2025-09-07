@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DetailLayout, type File } from "$lib/types.svelte";
+    import { DetailLayout, Format, type File } from "$lib/types.svelte";
 
     let {
         file: file = $bindable(),
@@ -29,13 +29,22 @@
     <img class="filePreview" alt="" src={file.preview} style:height={`${previewSize}px`}>
 
     <div class="fileDescription" style:font-size={`${nameSize}px`} 
-        style:flex-flow={`${textBelow ? "column" : "row"} nowrap`} 
         style:align-items={textBelow ? "center" : "start"} 
         style:justify-items={textBelow ? "start" : "center"}
     >
         <span class="fileName">
             {file.name}{#if showFileExtension && (file.extension != "")}<span class="extension">{`.${file.extension}`}</span>{/if}
         </span>
+
+        <div class="fileProperties">
+            {#each file.getProperties().filter(property => 
+                property.key != Format.propertyKeyForName
+                && !(property.key == Format.propertyKeyForExtension && showFileExtension)
+                && property.value.toString().trim() != ""
+            ).slice(0,2) as property}
+            <span class="fileProperty">{`${isNaN(property.value) ? "" : `${property.key}: `}${property.value}`}</span>
+            {/each}
+        </div>
     </div>
 </div>
 
@@ -46,7 +55,6 @@
         width: 100%;
         height: fit-content;
         display: flex;
-        /* padding: 0.4em; */
     }
 
     .filePreview {
@@ -55,17 +63,32 @@
 
     .fileDescription {
         width: max-content;
-        display: flex;
-    }
-
-    .fileName {
-        width: max-content;
         text-wrap: nowrap;
-        font-size: inherit;
+        display: flex;
 
-        > .extension {
+        flex-flow: column nowrap;
+
+        .fileName {
+            width: max-content;
             font-size: inherit;
+
+            > .extension {
+                font-size: inherit;
+                color: var(--gray-3);
+            }
+        }
+        
+        .fileProperties {
+            width: fit-content;
             color: var(--gray-3);
+            font-size: inherit;
+            display: flex;
+
+            flex-flow: column nowrap;
+
+            .fileProperty {
+                font-size: inherit;
+            }
         }
     }
 </style>
