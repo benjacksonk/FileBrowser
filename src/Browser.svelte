@@ -3,7 +3,7 @@
     import { DetailLayout } from "$lib/types.svelte";
     import FileBrowserConfig from "./FileBrowserConfig.svelte";
     import FileCollectionUI from "./FileCollectionUI.svelte";
-    import SectorViewConfig from "./SectorViewConfig.svelte";
+    import FileCollectionLayoutUI from "./FileCollectionLayoutUI.svelte";
 </script>
 
 
@@ -20,7 +20,7 @@
     <div class="filePanes">
         {#if browserState.splitSubsectors}
         <div class="sectorPane filePane">
-            <SectorViewConfig 
+            <FileCollectionLayoutUI 
                 bind:fileCollectionLayout={browserState.fileCollectionLayout}
             />
             
@@ -36,7 +36,7 @@
         {/if}
 
         <div class="filePane">
-            <SectorViewConfig 
+            <FileCollectionLayoutUI 
                 bind:fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
                 bind:fileSector={browserState.rootFileSector}
             />

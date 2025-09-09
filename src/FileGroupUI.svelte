@@ -10,7 +10,8 @@
         nameSize = 13,
         detailLayout = DetailLayout.Beside,
         inRows = false,
-        isFirstGroup = false
+        isFirstGroup = false,
+        shownProperties = 1
     } : {
         fileGroup: FileGroup,
         showHeader: boolean,
@@ -18,7 +19,8 @@
         nameSize: number,
         detailLayout: DetailLayout,
         inRows: boolean,
-        isFirstGroup: boolean
+        isFirstGroup: boolean,
+        shownProperties: number
     } = $props();
 </script>
 
@@ -45,7 +47,7 @@ style:border-left-width={(!inRows && !isFirstGroup) ? "1px" : "0"}
     style:grid-auto-flow={inRows ? "row" : "column"}
     >
         {#each fileGroup.files as file}
-        <FileUI {file} {previewSize} {nameSize} {detailLayout} showFileExtension={browserState.showFileExtensions}/>
+        <FileUI {file} {previewSize} {nameSize} {detailLayout} {shownProperties} showFileExtension={browserState.showFileExtensions}/>
         {/each}
     </div>
 </div>

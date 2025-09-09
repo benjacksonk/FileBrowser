@@ -6,16 +6,18 @@
         previewSize,
         nameSize,
         showFileExtension, 
-        detailLayout
+        detailLayout,
+        shownProperties
     } : {
         file: File,
         previewSize: number,
         nameSize: number,
         showFileExtension: boolean, 
-        detailLayout: DetailLayout
+        detailLayout: DetailLayout,
+        shownProperties: number
     } = $props();
 
-    let textBelow = $derived(detailLayout === DetailLayout.Below);
+    let textBelow: boolean = $derived(detailLayout === DetailLayout.Below);
 </script>
 
 
@@ -41,8 +43,10 @@
                 property.key != Format.propertyKeyForName
                 && !(property.key == Format.propertyKeyForExtension && showFileExtension)
                 && property.value.toString().trim() != ""
-            ).slice(0,2) as property}
+            ).slice(0, shownProperties - 1) as property, index}
+            {#if (1 + index) < shownProperties}
             <span class="fileProperty">{`${isNaN(property.value) ? "" : `${property.key}: `}${property.value}`}</span>
+            {/if}
             {/each}
         </div>
     </div>
@@ -85,9 +89,14 @@
             display: flex;
 
             flex-flow: column nowrap;
+            gap: 0.38cap;
 
             .fileProperty {
                 font-size: inherit;
+
+                &:first-of-type {
+                    padding-top: 0.38cap;
+                }
             }
         }
     }

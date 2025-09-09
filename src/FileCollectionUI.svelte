@@ -19,6 +19,10 @@
     } = $props();
     
     let previewSize = $derived(fileCollectionLayout.previewSize);
+    let maxShownProperties: number = $derived.by(() => {
+        let gapHeight: number = nameSize * 0.38;
+        return Math.min(fileCollectionLayout.maxProperties, 1 + Math.floor(previewSize / (gapHeight + nameSize)));
+    })
 </script>
 
 
@@ -26,7 +30,7 @@
 <div class="FileCollectionUI">
     <div class="fileGroups" style:grid-auto-flow={inRows ? "column" : "row"}>
         {#each fileGroups as fileGroup, index}
-        <FileGroupUI {fileGroup} showHeader={showHeaders} {previewSize} {nameSize} {detailLayout} {inRows} isFirstGroup={index == 0}/>
+        <FileGroupUI {fileGroup} showHeader={showHeaders} {previewSize} {nameSize} {detailLayout} {inRows} shownProperties={maxShownProperties} isFirstGroup={index == 0}/>
         {/each}
     </div>
 </div>

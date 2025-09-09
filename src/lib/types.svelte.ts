@@ -97,7 +97,7 @@ export class Format {
 }
 
 export abstract class File {
-    valuesPerProperty: Map<string, any> = $state(new Map<string, any>());
+    #valuesPerProperty: Map<string, any> = $state(new Map<string, any>());
 
     constructor(nameWithExtension: string) {
         if (nameWithExtension.includes(".") && !nameWithExtension.endsWith(".")) {
@@ -116,7 +116,7 @@ export abstract class File {
     }
 
     tryGetProperty(propertyName: string): any {
-        return this.valuesPerProperty.get(propertyName) || Format.defaultsPerProperty.get(propertyName);
+        return this.#valuesPerProperty.get(propertyName) || Format.defaultsPerProperty.get(propertyName);
     }
 
     trySetProperty(propertyName: string, value: any): boolean {
@@ -125,7 +125,7 @@ export abstract class File {
             return false;
         }
 
-        this.valuesPerProperty.set(propertyName, value);
+        this.#valuesPerProperty.set(propertyName, value);
 
         if (propertyName === Format.propertyKeyForExtension) {
             this.trySetProperty(Format.propertyKeyForFormat, Format.getFileTypeByExtension(value));
@@ -133,19 +133,19 @@ export abstract class File {
         else if (propertyName === Format.propertyKeyForFormat) {
             let newFormat = value as Format;
             let mandatedProperties = newFormat.properties;
-            let oldProperties = [...this.valuesPerProperty.keys()];
+            let oldProperties = [...this.#valuesPerProperty.keys()];
             let obsoleteProperties = oldProperties.filter(it => !mandatedProperties.includes(it));
             let missingProperties = mandatedProperties.filter(it => !oldProperties.includes(it));
             
-            obsoleteProperties.forEach(it => this.valuesPerProperty.delete(it));
-            missingProperties.forEach(it => this.valuesPerProperty.set(it, Format.defaultsPerProperty.get(it)));
+            obsoleteProperties.forEach(it => this.#valuesPerProperty.delete(it));
+            missingProperties.forEach(it => this.#valuesPerProperty.set(it, Format.defaultsPerProperty.get(it)));
         }
 
         return true;
     }
     
     getProperties(): Array<{key: string, value: any}> {
-        return this.valuesPerProperty.entries().toArray().map(entry => ({
+        return this.#valuesPerProperty.entries().toArray().map(entry => ({
             key: entry[0],
             value: entry[1]
         }));
@@ -288,10 +288,11 @@ export class FileCategory {
 
 export class FileCollectionLayout {
     #files: File[] = $state([]);
-    
-    previewSize: number = $state(21);
-    groupedProperty: string = $state("");
     #orderedProperty: string = $state("");
+    
+    groupedProperty: string = $state("");
+    previewSize: number = $state(21);
+    maxProperties: number = $state(1);
 
     constructor(files: File[] = []) {
         this.#orderedProperty = Format.propertyKeyForName;

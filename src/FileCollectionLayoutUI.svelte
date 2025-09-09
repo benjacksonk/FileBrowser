@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browserState } from "$lib/browserState.svelte";
     import { DetailLayout, FileCollectionLayout, FileSector, Format } from "$lib/types.svelte";
 
     let {
@@ -55,6 +56,11 @@
         <label>
             <input type="checkbox" name="inRows" bind:checked={fileSector.inRows}/>
             In Rows
+        </label>
+
+        <label>
+            <span>Max Shown Properties:</span>
+            <input type="number" min="1" max="10" step="1" bind:value={fileCollectionLayout.maxProperties}/>
         </label>
     </div>
     {/if}
