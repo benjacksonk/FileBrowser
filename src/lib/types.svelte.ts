@@ -252,7 +252,11 @@ export class FileSector extends File {
                 fileSort.files.push(file);
             }
             else {
-                newFileSorts.push({legiblePropertyValue: file_legiblePropValue, files: [file]});
+                newFileSorts.push({
+                    propertyKey: property,
+                    legiblePropertyValue: file_legiblePropValue, 
+                    files: [file]
+                });
             }
         });
 
@@ -326,6 +330,7 @@ export enum DetailLayout {
 }
 
 export type FileGroup = {
+    propertyKey: string,
     legiblePropertyValue: any, 
     files: File[]
 }

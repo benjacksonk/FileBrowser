@@ -29,7 +29,7 @@
                 fileCollectionLayout={browserState.fileCollectionLayout}
                 detailLayout={DetailLayout.Beside}
                 inRows={false}
-                nameSize={browserState.textSize}
+                textSize={browserState.textSize}
                 showHeaders={browserState.fileCollectionLayout.groupedProperty !== ""}
             />
         </div>
@@ -46,7 +46,7 @@
                 fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
                 detailLayout={browserState.rootFileSector.detailLayout}
                 inRows={browserState.rootFileSector.inRows}
-                nameSize={browserState.textSize}
+                textSize={browserState.textSize}
                 showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty !== ""}
             />
         </div>

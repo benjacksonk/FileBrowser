@@ -1,26 +1,28 @@
 <script lang="ts">
-    import { DetailLayout, type FileGroup } from "$lib/types.svelte";
+    import { DetailLayout, FileCollectionLayout, Format, type FileGroup } from "$lib/types.svelte";
     import { browserState } from "$lib/browserState.svelte";
     import FileUI from "./FileUI.svelte";
 
     let {
         fileGroup,
         showHeader,
+        textSize = 13,
         previewSize = 21,
-        nameSize = 13,
+        maxShownProperties = 1,
         detailLayout = DetailLayout.Beside,
         inRows = false,
-        isFirstGroup = false,
-        shownProperties = 1
+        showFileExtension,
+        isFirstGroup = false
     } : {
         fileGroup: FileGroup,
         showHeader: boolean,
+        textSize: number,
         previewSize: number,
-        nameSize: number,
+        maxShownProperties: number,
         detailLayout: DetailLayout,
         inRows: boolean,
+        showFileExtension: boolean,
         isFirstGroup: boolean,
-        shownProperties: number
     } = $props();
 </script>
 
@@ -43,11 +45,11 @@ style:border-left-width={(!inRows && !isFirstGroup) ? "1px" : "0"}
 
     <div class="files"
     style:grid-row={inRows ? "unset" : `${showHeader ? "2" : "1"} / -1`}
-    style:font-size={`${nameSize}px`}
+    style:font-size={`${textSize}px`}
     style:grid-auto-flow={inRows ? "row" : "column"}
     >
         {#each fileGroup.files as file}
-        <FileUI {file} {previewSize} {nameSize} {detailLayout} {shownProperties} showFileExtension={browserState.showFileExtensions}/>
+        <FileUI {file} {textSize} {previewSize} {detailLayout} {maxShownProperties} {showFileExtension} hideFileExtensionProperty={fileGroup.propertyKey == Format.propertyKeyForExtension || showFileExtension}/>
         {/each}
     </div>
 </div>

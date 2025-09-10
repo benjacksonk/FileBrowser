@@ -1,20 +1,22 @@
 <script lang="ts">
-    import { DetailLayout, Format, type File } from "$lib/types.svelte";
+    import { DetailLayout, FileCollectionLayout, Format, type File } from "$lib/types.svelte";
 
     let {
         file: file = $bindable(),
-        previewSize,
-        nameSize,
-        showFileExtension, 
-        detailLayout,
-        shownProperties
+        textSize = 13,
+        previewSize = 21,
+        maxShownProperties = 1,
+        showFileExtension,
+        hideFileExtensionProperty,
+        detailLayout
     } : {
         file: File,
+        textSize: number,
         previewSize: number,
-        nameSize: number,
+        maxShownProperties: number,
         showFileExtension: boolean, 
-        detailLayout: DetailLayout,
-        shownProperties: number
+        hideFileExtensionProperty: boolean,
+        detailLayout: DetailLayout
     } = $props();
 
     let textBelow: boolean = $derived(detailLayout === DetailLayout.Below);
@@ -23,14 +25,14 @@
 
 
 <div class="FileUI" 
-    style:gap={`${(Math.sqrt(Math.max(nameSize, previewSize)))}px ${(2 * Math.sqrt(Math.max(nameSize, previewSize)))}px`} 
+    style:gap={`${(Math.sqrt(Math.max(textSize, previewSize)))}px ${(2 * Math.sqrt(Math.max(textSize, previewSize)))}px`} 
     style:flex-flow={textBelow ? "column" : "row"}
     style:align-items={"center"} 
     style:justify-items={textBelow ? "start" : "center"}
 >
     <img class="filePreview" alt="" src={file.preview} style:height={`${previewSize}px`}>
 
-    <div class="fileDescription" style:font-size={`${nameSize}px`} 
+    <div class="fileDescription" style:font-size={`${textSize}px`} 
         style:align-items={textBelow ? "center" : "start"} 
         style:justify-items={textBelow ? "start" : "center"}
     >
@@ -41,10 +43,10 @@
         <div class="fileProperties">
             {#each file.getProperties().filter(property => 
                 property.key != Format.propertyKeyForName
-                && !(property.key == Format.propertyKeyForExtension && showFileExtension)
+                && !(hideFileExtensionProperty && property.key == Format.propertyKeyForExtension)
                 && property.value.toString().trim() != ""
-            ).slice(0, shownProperties - 1) as property, index}
-            {#if (1 + index) < shownProperties}
+            ).slice(0, maxShownProperties - 1) as property, index}
+            {#if (1 + index) < maxShownProperties}
             <span class="fileProperty">{`${isNaN(property.value) ? "" : `${property.key}: `}${property.value}`}</span>
             {/if}
             {/each}

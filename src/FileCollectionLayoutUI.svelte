@@ -46,6 +46,7 @@
     <div class="sectorViewConfigColumn">
         <label>
             <span>Detail Layout:</span>
+            <input class="numInput" type="number" min="1" max="9" step="1" bind:value={fileCollectionLayout.maxProperties}/>
             <select bind:value={fileSector.detailLayout}>
                 {#each Object.values(DetailLayout) as detailLayoutMode}
                 <option value={detailLayoutMode}>{detailLayoutMode}</option>
@@ -56,11 +57,6 @@
         <label>
             <input type="checkbox" name="inRows" bind:checked={fileSector.inRows}/>
             In Rows
-        </label>
-
-        <label>
-            <span>Max Shown Properties:</span>
-            <input type="number" min="1" max="10" step="1" bind:value={fileCollectionLayout.maxProperties}/>
         </label>
     </div>
     {/if}
@@ -98,5 +94,10 @@
         flex-flow: row nowrap;
         gap: 0.6em;
         align-items: center;
+    }
+
+    .numInput {
+        field-sizing: content;
+        padding-left: var(--space-4);
     }
 </style>
