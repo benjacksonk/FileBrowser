@@ -191,7 +191,7 @@ export abstract class File {
     }
 }
 
-export class Asset /* or "Artifact" ? */ extends File {
+export class Asset /* possibly "Artifact" */ extends File {
     #preview: string = $state("");
 
     constructor(name: string, preview: string = "") {
@@ -320,7 +320,7 @@ export class FileCollectionLayout {
             return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
         });
     }
-} // detailFlow, inRows
+}
 
 // Detail Info Properties
 export enum DetailLayout {

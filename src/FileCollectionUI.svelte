@@ -1,6 +1,6 @@
 <script lang="ts">
     import { browserState } from "$lib/browserState.svelte";
-    import { DetailLayout, FileCollectionLayout, FileSector, Format, type FileGroup } from "$lib/types.svelte";
+    import { DetailLayout, FileCollectionLayout, Format, type FileGroup } from "$lib/types.svelte";
     import FileGroupUI from "./FileGroupUI.svelte";
 
     let {

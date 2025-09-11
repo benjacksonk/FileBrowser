@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { DetailLayout, FileCollectionLayout, Format, type File } from "$lib/types.svelte";
+    import { DetailLayout, Format, type File } from "$lib/types.svelte";
 
     let {
         file: file = $bindable(),
         textSize = 13,
         previewSize = 21,
         maxShownProperties = 1,
-        showFileExtension,
-        hideFileExtensionProperty,
-        detailLayout
+        showFileExtension = true,
+        hiddenProperties = [],
+        detailLayout = DetailLayout.Beside
     } : {
         file: File,
         textSize: number,
         previewSize: number,
         maxShownProperties: number,
         showFileExtension: boolean, 
-        hideFileExtensionProperty: boolean,
+        hiddenProperties: string[],
         detailLayout: DetailLayout
     } = $props();
 
@@ -43,7 +43,8 @@
         <div class="fileProperties">
             {#each file.getProperties().filter(property => 
                 property.key != Format.propertyKeyForName
-                && !(hideFileExtensionProperty && property.key == Format.propertyKeyForExtension)
+                && !hiddenProperties.includes(property.key)
+                && !(property.key == Format.propertyKeyForExtension && showFileExtension)
                 && property.value.toString().trim() != ""
             ).slice(0, maxShownProperties - 1) as property, index}
             {#if (1 + index) < maxShownProperties}

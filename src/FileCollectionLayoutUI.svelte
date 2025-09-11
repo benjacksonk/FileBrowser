@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { browserState } from "$lib/browserState.svelte";
     import { DetailLayout, FileCollectionLayout, FileSector, Format } from "$lib/types.svelte";
 
     let {
