@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DetailLayout, Format, type FileGroup } from "$lib/types.svelte";
+    import { DetailLayout, PropertyType, type FileGroup } from "$lib/types.svelte";
     import FileUI from "./FileUI.svelte";
 
     let {
@@ -48,7 +48,12 @@ style:border-left-width={(!inRows && !isFirstGroup) ? "1px" : "0"}
     style:grid-auto-flow={inRows ? "row" : "column"}
     >
         {#each fileGroup.files as file}
-        <FileUI {file} {textSize} {previewSize} {detailLayout} {maxShownProperties} {showFileExtension} hiddenProperties={showFileExtension ? [fileGroup.propertyKey, Format.propertyKeyForExtension] : [fileGroup.propertyKey]}/>
+        <FileUI {file} {textSize} {previewSize} {detailLayout} {maxShownProperties} {showFileExtension} 
+        hiddenProperties={
+            showFileExtension ? 
+            (fileGroup.propertyType ? [fileGroup.propertyType, PropertyType.fileExtension] : [PropertyType.fileExtension]) : 
+            (fileGroup.propertyType ? [fileGroup.propertyType] : [])
+        }/>
         {/each}
     </div>
 </div>

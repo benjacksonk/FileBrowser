@@ -1,94 +1,100 @@
+export enum FileType {
+    Uncategorized   = "Uncategorized",
+    Application     = "Application",
+    Audio           = "Audio",
+    Directory       = "Directory",
+    Image           = "Image",
+    TextDocument    = "Text Document",
+    Video           = "Video",
+}
+
+export enum PropertyType {
+    fileExtension   = "Extension",
+    fileFormat      = "Format",
+    fileMass        = "Mass",
+    fileName        = "Name",
+    fileType        = "Type",
+    heightPixels    = "Height (px)",
+    widthPixels     = "Width (px)",
+}
+
 export class Format {
-    // Property Strings
-    static propertyKeyForName: string = "Name";
-    static propertyKeyForExtension: string = "Extension";
-    static propertyKeyForFormat: string = "Format";
-    static propertyKeyForSize: string = "Size";
-    static propertyKeyForImageWidth: string = "Image Width (px)";
-    static propertyKeyForImageHeight: string = "Image Height (px)";
-    //
+    name        = $state("");
+    icon        = $state("");
+    fileType    = $state(FileType.Uncategorized);
+    extensions  = $state(new Array<string>());
 
-    static #categoryPerFormat: Map<Format, string> = new Map<Format, string>();
+    static #fileTypePerFormat   = new Map<Format, FileType>();
+    
+    static perExtension         = new Map<string, Format>();
+    static formats              = new Set<Format>();
+    
+    static usualFormats = {
+        defaultFormat: new Format(
+            "Unformatted File", 
+            FileType.Uncategorized
+        ),
+        
+        fileSectorFormat: new Format(
+            "File Sector", 
+            FileType.Directory
+        ),
+        
+        pngFormat: new Format(
+            "Portable Network Graphics", 
+            FileType.Uncategorized, 
+            [ "png" ], 
+            ""
+        ),
 
-    static defaultProperties: string[] = [
-        Format.propertyKeyForName, 
-        Format.propertyKeyForExtension, 
-        Format.propertyKeyForFormat, 
-        Format.propertyKeyForSize
-    ];
+        exeFormat: new Format(
+            "Executable", 
+            FileType.Application, 
+            [ "exe" ], 
+            ""
+        ),
 
-    static perExtension: Map<string, Format> = new Map<string, Format>();
-    static formats: Set<Format> = new Set<Format>();
+        docFormat: new Format(
+            "Word Document", 
+            FileType.TextDocument, 
+            [ "doc", "docx" ], 
+            ""
+        ),
 
-    static unspecifiedFormat: Format = new Format("Unspecified");
-    static fileSectorFormat: Format = new Format("File Sector");
-    static pngFormat: Format = new Format(
-        "Portable Network Graphics", 
-        "", 
-        [ "png" ], 
-        [
-            Format.propertyKeyForImageWidth,
-            Format.propertyKeyForImageHeight
-        ]
-    );
-    static exeFormat: Format = new Format(
-        "Executable", 
-        "", 
-        [ "exe" ]
-    );
-    static docFormat: Format = new Format(
-        "Word Document", 
-        "", 
-        [ "doc", "docx" ]
-    );
-    static txtFormat: Format = new Format(
-        "Text", 
-        "", 
-        [ "txt" ]
-    );
-    static pdfFormat: Format = new Format(
-        "Adobe Portable Document Format", 
-        "", 
-        [ "pdf" ]
-    );
+        txtFormat: new Format(
+            "Text", 
+            FileType.TextDocument, 
+            [ "txt" ],
+            ""
+        ),
 
-    static defaultsPerProperty: Map<string, any> = new Map<string, any>([
-        [Format.propertyKeyForName, ""],
-        [Format.propertyKeyForExtension, ""],
-        [Format.propertyKeyForFormat, Format.unspecifiedFormat],
-        [Format.propertyKeyForSize, 0],
-        [Format.propertyKeyForImageWidth, 0],
-        [Format.propertyKeyForImageHeight, 0]
-    ]);
-
-    static getFileTypeByName(formatName: string): Format {
-        return Format.formats.values().find(it => it.name === formatName) || Format.unspecifiedFormat;
+        pdfFormat: new Format(
+            "Adobe Portable Document Format", 
+            FileType.Uncategorized, 
+            [ "pdf" ], 
+            ""
+        )
     }
 
-    static getFileTypeByExtension(extension: string): Format {
-        return Format.perExtension.get(extension) || Format.unspecifiedFormat;
-    }
-
-    name: string = $state("");
-    icon: string = $state("");
-    extensions: string[] = $state([]);
-    properties: string[] = $state([]);
-
-    constructor(name: string, icon: string = "", extensions: string[] = [], properties: string[] = []) {
+    constructor(name: string, category: FileType, extensions: string[] = [], icon: string = "") {
         this.name = name;
         this.icon = icon;
-        this.properties = [...Format.defaultProperties, ...properties];
+        this.fileType = category;
         this.extensions = extensions;
-        extensions.forEach((extension: string) => Format.perExtension.set(extension, this));
+        extensions.forEach(extension => Format.perExtension.set(extension, this));
         Format.formats.add(this);
     }
 
-    static getCategoryPerType(format: Format): string {
-        return Format.#categoryPerFormat.get(format) || "Unspecified";
+    static getFileTypePerFormat(format: Format): FileType | undefined {
+        return Format.#fileTypePerFormat.get(format);
+    }
+    
+    static getFormatByName(formatName: string): Format | undefined {
+        return Format.formats.values().find(it => it.name === formatName);
     }
 
-    static getFileTypePerExtension(extension: string): Format {
-        return Format.perExtension.get(extension) || Format.unspecifiedFormat;
+    static getFormatByExtension(extension: string): Format | undefined {
+        return Format.perExtension.get(extension);
     }
 
     toString(): string {
@@ -96,18 +102,102 @@ export class Format {
     }
 }
 
+export class PropertyMap extends Map<PropertyType, any> {
+    static readonly #defaultValues 
+    = new Map<PropertyType, any>([
+        [PropertyType.fileExtension, ""],
+        [PropertyType.fileFormat, Format.usualFormats.defaultFormat],
+        [PropertyType.fileMass, 0],
+        [PropertyType.fileName, ""],
+        [PropertyType.fileType, FileType.Uncategorized],
+        [PropertyType.heightPixels, 0],
+        [PropertyType.widthPixels, 0]
+    ]);
+
+    static readonly #commonProperties: Array<PropertyType> 
+    = [
+        PropertyType.fileName,
+        PropertyType.fileExtension,
+        PropertyType.fileFormat,
+        PropertyType.fileType,
+        PropertyType.fileMass,
+    ];
+
+    static readonly propertiesPerFileType
+    = new Map<FileType, Array<PropertyType>>([
+        [FileType.Uncategorized, []],
+        [FileType.Application, []],
+        [FileType.Audio, []],
+        [FileType.Directory, []],
+        [FileType.Image, [
+            PropertyType.heightPixels,
+            PropertyType.widthPixels
+        ]],
+        [FileType.TextDocument, []],
+        [FileType.Video, []]
+    ]);
+
+    constructor(types: Array<PropertyType> = []) {
+        let typeSet: Set<PropertyType> 
+        = new Set(PropertyMap.#commonProperties).union(new Set(types));
+
+        let initialEntries: Array<[PropertyType, any]> 
+        = typeSet.values().toArray().map(type => [type, PropertyMap.#defaultValues.get(type)]);
+
+        super();
+        initialEntries.forEach(entry => super.set(entry[0], entry[1]));
+    }
+
+    override get(key: PropertyType) {
+        return super.get(key) ?? PropertyMap.#defaultValues.get(key);
+    }
+
+    override set(key: PropertyType, value: any): this {
+        super.set(key, value);
+
+        if (key === PropertyType.fileExtension) {
+            this.set(PropertyType.fileFormat, Format.getFormatByExtension(value));
+        }
+        else if (key === PropertyType.fileFormat) {
+            let format = value as Format;
+            if (!(format instanceof Format)) { console.error("value not instanceof Format"); }
+            this.set(PropertyType.fileType, format.fileType);
+        }
+        else if (key === PropertyType.fileType) {
+            let oldFileType: FileType = this.get(PropertyType.fileType);
+            let newFileType: FileType = value as FileType;
+
+            if (PropertyMap.propertiesPerFileType == undefined) {
+                console.error("PropertyMap.perFileType == undefined");
+            }
+            
+            let oldPropTypes = new Set<PropertyType>(PropertyMap.propertiesPerFileType.get(oldFileType));
+            let reqPropTypes = new Set<PropertyType>(PropertyMap.propertiesPerFileType.get(newFileType));
+            
+            let obsoletePropTypes = oldPropTypes.difference(reqPropTypes);
+            let missingPropTypes = reqPropTypes.difference(oldPropTypes);
+
+            obsoletePropTypes.forEach(propType => this.delete(propType));
+            missingPropTypes.forEach(propType => this.set(propType, PropertyMap.#defaultValues.get(propType)));
+        }
+
+        return this;
+    }
+}
+
 export abstract class File {
-    #valuesPerProperty: Map<string, any> = $state(new Map<string, any>());
+    readonly propertyMap: PropertyMap
+    = $state(new PropertyMap());
 
     constructor(nameWithExtension: string) {
-        if (nameWithExtension.includes(".") && !nameWithExtension.endsWith(".")) {
+        if (nameWithExtension.includes(".")) {
             let nameParts = nameWithExtension.split(".");
             let extension = nameParts.pop() as string;
-            this.trySetProperty(Format.propertyKeyForExtension, extension);
-            this.trySetProperty(Format.propertyKeyForName, nameParts.join("."));
+            this.propertyMap.set(PropertyType.fileName, nameParts.join("."));
+            this.propertyMap.set(PropertyType.fileExtension, extension);
         }
         else {
-            this.trySetProperty(Format.propertyKeyForName, nameWithExtension);
+            this.propertyMap.set(PropertyType.fileName, nameWithExtension);
         }
     }
     
@@ -115,83 +205,13 @@ export abstract class File {
         return "/images/icon-generic.png";//this.fileType.icon;
     }
 
-    tryGetProperty(propertyName: string): any {
-        return this.#valuesPerProperty.get(propertyName) || Format.defaultsPerProperty.get(propertyName);
-    }
-
-    trySetProperty(propertyName: string, value: any): boolean {
-        if (!this.format.properties.includes(propertyName)
-            || typeof value !== typeof Format.defaultsPerProperty.get(propertyName)) {
-            return false;
-        }
-
-        this.#valuesPerProperty.set(propertyName, value);
-
-        if (propertyName === Format.propertyKeyForExtension) {
-            this.trySetProperty(Format.propertyKeyForFormat, Format.getFileTypeByExtension(value));
-        }
-        else if (propertyName === Format.propertyKeyForFormat) {
-            let newFormat = value as Format;
-            let mandatedProperties = newFormat.properties;
-            let oldProperties = [...this.#valuesPerProperty.keys()];
-            let obsoleteProperties = oldProperties.filter(it => !mandatedProperties.includes(it));
-            let missingProperties = mandatedProperties.filter(it => !oldProperties.includes(it));
-            
-            obsoleteProperties.forEach(it => this.#valuesPerProperty.delete(it));
-            missingProperties.forEach(it => this.#valuesPerProperty.set(it, Format.defaultsPerProperty.get(it)));
-        }
-
-        return true;
-    }
-    
-    getProperties(): Array<{key: string, value: any}> {
-        return this.#valuesPerProperty.entries().toArray().map(entry => ({
-            key: entry[0],
-            value: entry[1]
-        }));
-    }
-
-    getPropertiesByKeys(keys: Array<string>): Array<{key: string, value: any}> {
-        return keys.map(key => ({
-            key: key,
-            value: this.tryGetProperty(key)
-        }));
-    }
-
-    get name(): string {
-        return this.tryGetProperty(Format.propertyKeyForName);
-    }
-    set name(newName: string) {
-        this.trySetProperty(Format.propertyKeyForName, newName);
-    }
-
-    get extension(): string {
-        return this.tryGetProperty(Format.propertyKeyForExtension);
-    }
-    set extension(newExtension: string) {
-        this.trySetProperty(Format.propertyKeyForExtension, newExtension);
-    }
-    
-    get format(): Format {
-        return this.tryGetProperty(Format.propertyKeyForFormat);
-    }
-    set format(newFormat: Format) {
-        this.trySetProperty(Format.propertyKeyForFormat, newFormat);
-    }
-    
-    get fileSize(): number {
-        return this.tryGetProperty(Format.propertyKeyForSize);
-    }
-    set fileSize(newFileSize: number) {
-        this.trySetProperty(Format.propertyKeyForSize, newFileSize);
-    }
-
     toString(): string {
-        return this.name;
+        return this.propertyMap.get(PropertyType.fileName);
     }
 }
 
-export class Asset /* possibly "Artifact" */ extends File {
+// possibly "Artifact"
+export class Asset extends File {
     #preview: string = $state("");
 
     constructor(name: string, preview: string = "") {
@@ -205,19 +225,24 @@ export class Asset /* possibly "Artifact" */ extends File {
 }
 
 export class FileSector extends File {
-    #files: File[] = $state([]);
+    #files: Array<File> = $state([]);
     #fileCollectionLayout: FileCollectionLayout = $state(new FileCollectionLayout());
 
     detailLayout: DetailLayout = $state(DetailLayout.Beside);
     inRows: boolean = $state(false);
 
-    fileGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.files, this.#fileCollectionLayout.groupedProperty));
-    assetGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.assets, this.#fileCollectionLayout.groupedProperty));
-    sectorGroups: FileGroup[] = $derived(this.#groupFilesByProperty(this.sectors, this.#fileCollectionLayout.groupedProperty));
+    fileGroups: Array<FileGroup>
+    = $derived(this.#groupFilesByProperty(this.files, this.#fileCollectionLayout.groupedProperty));
+    
+    assetGroups: Array<FileGroup>
+    = $derived(this.#groupFilesByProperty(this.assets, this.#fileCollectionLayout.groupedProperty));
+    
+    sectorGroups: Array<FileGroup>
+    = $derived(this.#groupFilesByProperty(this.sectors, this.#fileCollectionLayout.groupedProperty));
 
     constructor(name: string, files: File[] = []) {
         super(name);
-        this.trySetProperty(Format.propertyKeyForFormat, Format.fileSectorFormat);
+        this.propertyMap.set(PropertyType.fileFormat, Format.usualFormats.fileSectorFormat);
         this.#files = files;
         this.#fileCollectionLayout = new FileCollectionLayout(files);
     }
@@ -238,40 +263,49 @@ export class FileSector extends File {
         return this.#fileCollectionLayout;
     }
 
-    #groupFilesByProperty<T extends File>(files: T[], property: any) {
-        if (property === "") {
-            return [{legiblePropertyValue: "", files: this.files} as FileGroup];
+    #groupFilesByProperty<T extends File>(files: T[], propertyType: PropertyType|null) {
+        if (propertyType == null) {
+            return new Array<FileGroup>({
+                propertyType: propertyType,
+                legiblePropertyValue: null,
+                files: files
+            } as FileGroup);
         }
 
-        let newFileSorts: FileGroup[] = [];
+        let newFileGroups: FileGroup[] = [];
         
         files.forEach(file => {
-            let file_legiblePropValue = this.#toLegible(file.tryGetProperty(property));
-            let fileSort = newFileSorts.find(it => it.legiblePropertyValue === file_legiblePropValue);
-            if (fileSort != null) {
-                fileSort.files.push(file);
+            let file_legiblePropValue = this.#toLegible(file.propertyMap.get(propertyType));
+            let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
+
+            if (fileGroup != null) {
+                fileGroup.files.push(file);
             }
             else {
-                newFileSorts.push({
-                    propertyKey: property,
+                newFileGroups.push({
+                    propertyType: propertyType,
                     legiblePropertyValue: file_legiblePropValue, 
                     files: [file]
                 });
             }
         });
 
-        newFileSorts.sort((a, b) => {
+        newFileGroups.sort((a, b) => {
             let aVal = a.legiblePropertyValue;
             let bVal = b.legiblePropertyValue;
             return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-        })
+        });
         
-        return newFileSorts;
+        return newFileGroups;
     }
 
     #toLegible(val: any) {
         if (typeof val === 'object') {
-            if (val instanceof Format || val instanceof FileCategory || val instanceof File) {
+            if (val instanceof File) {
+                return val.propertyMap.get(PropertyType.fileName);
+            }
+            
+            if (val instanceof Format) {
                 return val.name;
             }
 
@@ -282,43 +316,39 @@ export class FileSector extends File {
     }
 }
 
-export class FileCategory {
-    name: string = "";
-
-    toString(): string {
-        return this.name;
-    }
-}
-
 export class FileCollectionLayout {
-    #files: File[] = $state([]);
-    #orderedProperty: string = $state("");
+    #files: Array<File> = $state([]);
+    #orderedProperty: PropertyType = $state(PropertyType.fileName);
     
-    groupedProperty: string = $state("");
+    groupedProperty: PropertyType|null = $state(null);
     previewSize: number = $state(21);
     maxProperties: number = $state(1);
 
     constructor(files: File[] = []) {
-        this.#orderedProperty = Format.propertyKeyForName;
-        this.groupedProperty = Format.propertyKeyForFormat; //TEMP
+        this.#orderedProperty = PropertyType.fileName;
+        this.groupedProperty = PropertyType.fileType; //TEMP
     }
 
-    get orderedProperty(): string {
+    get orderedProperty(): PropertyType {
         return this.#orderedProperty;
     }
-    set orderedProperty(newProperty: string) {
+    set orderedProperty(newProperty: PropertyType) {
         this.#orderedProperty = newProperty;
 
-        this.#files.sort((fileA: File, fileB: File): number => {
-            let orderedProperty = newProperty;
-            let propertyA = fileA.tryGetProperty(orderedProperty);
-            let propertyB = fileB.tryGetProperty(orderedProperty);
-            if (orderedProperty === Format.propertyKeyForFormat) {
-                propertyA = propertyA.name;
-                propertyB = propertyB.name;
-            }
-            return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
-        });
+        if (newProperty != null) {
+            this.#files.sort((fileA: File, fileB: File): number => {
+                let orderedProperty = newProperty;
+                let propertyA = fileA.propertyMap.get(newProperty);
+                let propertyB = fileB.propertyMap.get(newProperty);
+                
+                if (orderedProperty === PropertyType.fileFormat) {
+                    propertyA = propertyA.name;
+                    propertyB = propertyB.name;
+                }
+
+                return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
+            });
+        }
     }
 }
 
@@ -330,7 +360,25 @@ export enum DetailLayout {
 }
 
 export type FileGroup = {
-    propertyKey: string,
+    propertyType: PropertyType|null,
     legiblePropertyValue: any, 
     files: File[]
+}
+
+export class PropertyVisibilities {
+    #visibilitiesPerPropertyKey: Map<string, VisibilityLevel> = new Map<string, VisibilityLevel>();
+    
+    get(level: VisibilityLevel): Array<string> {
+        return this.#visibilitiesPerPropertyKey
+        .entries()
+        .filter(entry => entry[1] == level)
+        .map(entry => entry[0])
+        .toArray();
+    }
+}
+
+export enum VisibilityLevel {
+    Show    = "Show",
+    Allow   = "Allow",
+    Hide    = "Hide",
 }

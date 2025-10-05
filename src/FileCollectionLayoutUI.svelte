@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DetailLayout, FileCollectionLayout, FileSector, Format } from "$lib/types.svelte";
+    import { DetailLayout, FileCollectionLayout, FileSector, PropertyType } from "$lib/types.svelte";
 
     let {
         fileCollectionLayout = $bindable(),
@@ -9,8 +9,7 @@
         fileSector?: FileSector|null
     } = $props();
 
-    let groupedProperties = Format.defaultsPerProperty.keys();
-    let orderedProperties = Format.defaultsPerProperty.keys();
+    let propertyTypes = Object.values(PropertyType);
 </script>
 
 
@@ -25,8 +24,8 @@
         <label>
             <span>Group by:</span>
             <select bind:value={fileCollectionLayout.groupedProperty}>
-                {#each groupedProperties as groupedPropertyName}
-                <option value={groupedPropertyName}>{groupedPropertyName}</option>
+                {#each propertyTypes as property}
+                <option value={property}>{property}</option>
                 {/each}
             </select>
         </label>
@@ -34,8 +33,8 @@
         <label>
             <span>Order by:</span>
             <select bind:value={fileCollectionLayout.orderedProperty}>
-                {#each orderedProperties as orderedPropertyName}
-                <option value={orderedPropertyName}>{orderedPropertyName}</option>
+                {#each propertyTypes as property}
+                <option value={property}>{property}</option>
                 {/each}
             </select>
         </label>

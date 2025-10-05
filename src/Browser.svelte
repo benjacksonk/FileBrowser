@@ -30,7 +30,7 @@
                 detailLayout={DetailLayout.Beside}
                 inRows={false}
                 textSize={browserState.textSize}
-                showHeaders={browserState.fileCollectionLayout.groupedProperty !== ""}
+                showHeaders={browserState.fileCollectionLayout.groupedProperty != null}
             />
         </div>
         {/if}
@@ -47,7 +47,7 @@
                 detailLayout={browserState.rootFileSector.detailLayout}
                 inRows={browserState.rootFileSector.inRows}
                 textSize={browserState.textSize}
-                showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty !== ""}
+                showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty != null}
             />
         </div>
     </div>

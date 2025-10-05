@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DetailLayout, Format, type File } from "$lib/types.svelte";
+    import { DetailLayout, PropertyType, type File } from "$lib/types.svelte";
 
     let {
         file: file = $bindable(),
@@ -15,7 +15,7 @@
         previewSize: number,
         maxShownProperties: number,
         showFileExtension: boolean, 
-        hiddenProperties: string[],
+        hiddenProperties: PropertyType[],
         detailLayout: DetailLayout
     } = $props();
 
@@ -37,18 +37,21 @@
         style:justify-items={textBelow ? "start" : "center"}
     >
         <span class="fileName">
-            {file.name}{#if showFileExtension && (file.extension != "")}<span class="extension">{`.${file.extension}`}</span>{/if}
+            {file.propertyMap.get(PropertyType.fileName)}{#if showFileExtension && (file.propertyMap.get(PropertyType.fileExtension) != "")}<span class="extension">{`.${file.propertyMap.get(PropertyType.fileExtension)}`}</span>{/if}
         </span>
 
         <div class="fileProperties">
-            {#each file.getProperties().filter(property => 
-                property.key != Format.propertyKeyForName
-                && !hiddenProperties.includes(property.key)
-                && !(property.key == Format.propertyKeyForExtension && showFileExtension)
+            {#each file.propertyMap.entries()
+            .map(entry => ({type: entry[0], value: entry[1]}))
+            .filter(property => 
+                property.type != PropertyType.fileName
+                && !hiddenProperties.includes(property.type)
+                && !(property.type == PropertyType.fileExtension && showFileExtension)
                 && property.value.toString().trim() != ""
-            ).slice(0, maxShownProperties - 1) as property, index}
+            ).toArray().slice(0, maxShownProperties - 1) as property, index
+            }
             {#if (1 + index) < maxShownProperties}
-            <span class="fileProperty">{`${isNaN(property.value) ? "" : `${property.key}: `}${property.value}`}</span>
+            <span class="fileProperty">{`${isNaN(property.value) ? "" : `${property.type}: `}${property.value}`}</span>
             {/if}
             {/each}
         </div>
