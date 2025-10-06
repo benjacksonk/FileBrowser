@@ -185,7 +185,8 @@ export class PropertyMap extends Map<PropertyType, any> {
     }
 }
 
-export abstract class File {
+// would be abstract, but that breaks the type check in fileCollection.getGroups
+export class File {
     readonly propertyMap: PropertyMap
     = $state(new PropertyMap());
 
@@ -231,15 +232,6 @@ export class FileSector extends File {
     detailLayout: DetailLayout = $state(DetailLayout.Beside);
     inRows: boolean = $state(false);
 
-    fileGroups: Array<FileGroup>
-    = $derived(this.#groupFilesByProperty(this.files, this.#fileCollectionLayout.groupedProperty));
-    
-    assetGroups: Array<FileGroup>
-    = $derived(this.#groupFilesByProperty(this.assets, this.#fileCollectionLayout.groupedProperty));
-    
-    sectorGroups: Array<FileGroup>
-    = $derived(this.#groupFilesByProperty(this.sectors, this.#fileCollectionLayout.groupedProperty));
-
     constructor(name: string, files: File[] = []) {
         super(name);
         this.propertyMap.set(PropertyType.fileFormat, Format.usualFormats.fileSectorFormat);
@@ -262,19 +254,62 @@ export class FileSector extends File {
     get fileCollectionLayout(): FileCollectionLayout {
         return this.#fileCollectionLayout;
     }
+}
 
-    #groupFilesByProperty<T extends File>(files: T[], propertyType: PropertyType|null) {
+export class FileCollectionLayout {
+    #files: Array<File> = $state([]);
+    #orderedProperty: PropertyType = $state(PropertyType.fileName);
+    
+    groupedProperty: PropertyType|null = $state(null);
+    previewSize: number = $state(21);
+    maxProperties: number = $state(1);
+
+    constructor(files: File[] = []) {
+        this.#files = files;
+        this.#orderedProperty = PropertyType.fileName;
+        this.groupedProperty = PropertyType.fileType; //TEMP
+    }
+
+    get orderedProperty(): PropertyType {
+        return this.#orderedProperty;
+    }
+    set orderedProperty(newProperty: PropertyType) {
+        this.#orderedProperty = newProperty;
+
+        if (newProperty != null) {
+            this.#files.sort((fileA: File, fileB: File): number => {
+                let orderedProperty = newProperty;
+                let propertyA = fileA.propertyMap.get(newProperty);
+                let propertyB = fileB.propertyMap.get(newProperty);
+                
+                if (orderedProperty === PropertyType.fileFormat) {
+                    propertyA = propertyA.name;
+                    propertyB = propertyB.name;
+                }
+
+                return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
+            });
+        }
+    }
+
+    getGroups<T extends File>(propertyType: PropertyType|null, typeT: new (...params : any[]) => T) {
+        let thefiles = this.#files.filter(
+            file => {
+                return file instanceof typeT;
+            }
+        );
+
         if (propertyType == null) {
             return new Array<FileGroup>({
                 propertyType: propertyType,
                 legiblePropertyValue: null,
-                files: files
+                files: thefiles
             } as FileGroup);
         }
 
         let newFileGroups: FileGroup[] = [];
         
-        files.forEach(file => {
+        thefiles.forEach(file => {
             let file_legiblePropValue = this.#toLegible(file.propertyMap.get(propertyType));
             let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
 
@@ -313,42 +348,6 @@ export class FileSector extends File {
         }
 
         return val;
-    }
-}
-
-export class FileCollectionLayout {
-    #files: Array<File> = $state([]);
-    #orderedProperty: PropertyType = $state(PropertyType.fileName);
-    
-    groupedProperty: PropertyType|null = $state(null);
-    previewSize: number = $state(21);
-    maxProperties: number = $state(1);
-
-    constructor(files: File[] = []) {
-        this.#orderedProperty = PropertyType.fileName;
-        this.groupedProperty = PropertyType.fileType; //TEMP
-    }
-
-    get orderedProperty(): PropertyType {
-        return this.#orderedProperty;
-    }
-    set orderedProperty(newProperty: PropertyType) {
-        this.#orderedProperty = newProperty;
-
-        if (newProperty != null) {
-            this.#files.sort((fileA: File, fileB: File): number => {
-                let orderedProperty = newProperty;
-                let propertyA = fileA.propertyMap.get(newProperty);
-                let propertyB = fileB.propertyMap.get(newProperty);
-                
-                if (orderedProperty === PropertyType.fileFormat) {
-                    propertyA = propertyA.name;
-                    propertyB = propertyB.name;
-                }
-
-                return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
-            });
-        }
     }
 }
 

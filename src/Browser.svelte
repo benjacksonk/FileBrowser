@@ -1,6 +1,6 @@
 <script lang="ts">
     import { browserState } from "$lib/browserState.svelte";
-    import { DetailLayout } from "$lib/types.svelte";
+    import { Asset, DetailLayout, File, FileSector } from "$lib/types.svelte";
     import FileBrowserConfig from "./FileBrowserConfig.svelte";
     import FileCollectionUI from "./FileCollectionUI.svelte";
     import FileCollectionLayoutUI from "./FileCollectionLayoutUI.svelte";
@@ -25,7 +25,7 @@
             />
             
             <FileCollectionUI
-                fileGroups={browserState.rootFileSector.sectorGroups}
+                fileGroups={browserState.rootFileSector.fileCollectionLayout.getGroups<FileSector>(browserState.fileCollectionLayout.groupedProperty, FileSector)}
                 fileCollectionLayout={browserState.fileCollectionLayout}
                 detailLayout={DetailLayout.Beside}
                 inRows={false}
@@ -42,7 +42,10 @@
             />
             
             <FileCollectionUI 
-                fileGroups={browserState.splitSubsectors ? browserState.rootFileSector.assetGroups : browserState.rootFileSector.fileGroups}
+                fileGroups={browserState.splitSubsectors ? 
+                    browserState.rootFileSector.fileCollectionLayout.getGroups<Asset>(browserState.rootFileSector.fileCollectionLayout.groupedProperty, Asset) : 
+                    browserState.rootFileSector.fileCollectionLayout.getGroups<File>(browserState.rootFileSector.fileCollectionLayout.groupedProperty, File)
+                }
                 fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
                 detailLayout={browserState.rootFileSector.detailLayout}
                 inRows={browserState.rootFileSector.inRows}
