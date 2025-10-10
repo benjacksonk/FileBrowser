@@ -23,7 +23,7 @@
 
         <label>
             <span>Group by:</span>
-            <select bind:value={fileCollectionLayout.groupedProperty}>
+            <select bind:value={fileCollectionLayout.groupProperty}>
                 {#each propertyTypes as property}
                 <option value={property}>{property}</option>
                 {/each}
@@ -32,7 +32,7 @@
         
         <label>
             <span>Order by:</span>
-            <select bind:value={fileCollectionLayout.orderedProperty}>
+            <select bind:value={fileCollectionLayout.orderProperty}>
                 {#each propertyTypes as property}
                 <option value={property}>{property}</option>
                 {/each}
@@ -45,7 +45,7 @@
         <label>
             <span>Detail Layout:</span>
             <input class="numInput" type="number" min="1" max="9" step="1" bind:value={fileCollectionLayout.maxProperties}/>
-            <select bind:value={fileSector.detailLayout}>
+            <select bind:value={fileSector.fileCollectionLayout.detailLayout}>
                 {#each Object.values(DetailLayout) as detailLayoutMode}
                 <option value={detailLayoutMode}>{detailLayoutMode}</option>
                 {/each}
@@ -53,7 +53,7 @@
         </label>
 
         <label>
-            <input type="checkbox" name="inRows" bind:checked={fileSector.inRows}/>
+            <input type="checkbox" name="inRows" bind:checked={fileSector.fileCollectionLayout.inRows}/>
             In Rows
         </label>
     </div>

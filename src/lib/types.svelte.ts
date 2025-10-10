@@ -203,21 +203,9 @@ export class PropertyMap extends Map<PropertyType, any> {
     }
 }
 
-// export const getClassNameSymbol = Symbol();
-
 // would be abstract, but that breaks the type check in fileCollection.getGroups
 export class File {
     readonly propertyMap = $state(new PropertyMap());
-
-    // static [getClassNameSymbol]() {
-    //     // return "File"
-    //     this.name;
-    // }
-
-    // [getClassNameSymbol]() {
-    //     return "File"
-    //     // this.name;
-    // }
 
     constructor(nameWithExtension: string) {
         if (nameWithExtension.includes(".")) {
@@ -267,97 +255,64 @@ export class Asset extends File {
 }
 
 export class FileSector extends File {
-    #files                  = $state<Array<File>>([]);
-    #fileCollectionLayout   = $state(new FileCollectionLayout());
+    #files = $state<Array<File>>([]);
 
-    detailLayout            = $state(DetailLayout.Beside);
-    inRows                  = $state(false);
+    fileCollectionLayout = $state(new FileCollectionLayout());
 
-    constructor(name: string, files: File[] = []) {
+    constructor(name: string, files: Array<File> = []) {
         super(name);
         this.propertyMap.set(PropertyType.fileFormat, Format.usualFormats.fileSectorFormat);
         this.#files = files;
-        this.#fileCollectionLayout = new FileCollectionLayout(files);
+        this.fileCollectionLayout = new FileCollectionLayout();
     }
 
-    get files(): File[] {
-        return [...this.#files];
-    }
+    getFiles(
+        fileClass: ConstructorType<File> = File, 
+        orderProperty: PropertyType = this.fileCollectionLayout.orderProperty, 
+        orderReversal: boolean = this.fileCollectionLayout.orderReversal
+    ): Array<File> {
+        let files = this.#files.toSorted((fileA: File, fileB: File): number => {
+            let valueA = fileA.propertyMap.get(orderProperty);
+            let valueB = fileB.propertyMap.get(orderProperty);
 
-    get assets(): Asset[] {
-        return this.#files.filter(it => it instanceof Asset);
-    }
+            if (orderProperty === PropertyType.fileFormat) {
+                valueA = valueA.name;
+                valueB = valueB.name;
+            }
 
-    get sectors(): FileSector[] {
-        return this.#files.filter(it => it instanceof FileSector);
-    }
-
-    get fileCollectionLayout(): FileCollectionLayout {
-        return this.#fileCollectionLayout;
-    }
-}
-
-export class FileCollectionLayout {
-    #files              = $state<Array<File>>([]);
-    #orderedProperty    = $state(PropertyType.fileName);
-    
-    groupedProperty = $state<PropertyType|null>(null);
-    previewSize     = $state(21);
-    maxProperties   = $state(1);
-
-    constructor(files: File[] = []) {
-        this.#files = files;
-        this.#orderedProperty = PropertyType.fileName;
-        this.groupedProperty = PropertyType.fileType; //TEMP
-    }
-
-    get orderedProperty(): PropertyType {
-        return this.#orderedProperty;
-    }
-    set orderedProperty(newProperty: PropertyType) {
-        this.#orderedProperty = newProperty;
-
-        if (newProperty != null) {
-            this.#files.sort((fileA: File, fileB: File): number => {
-                let orderedProperty = newProperty;
-                let propertyA = fileA.propertyMap.get(newProperty);
-                let propertyB = fileB.propertyMap.get(newProperty);
-                
-                if (orderedProperty === PropertyType.fileFormat) {
-                    propertyA = propertyA.name;
-                    propertyB = propertyB.name;
-                }
-
-                return propertyA < propertyB ? -1 : (propertyA > propertyB ? 1 : 0);
-            });
-        }
-    }
-
-    getFiles(fileClass: ConstructorType<File> = File) {
-        return this.#files.filter(
+            return valueA < valueB ? -1 : (valueA > valueB ? 1 : 0);
+        }).filter(
             file => { 
                 // return true;
                 // return (file.constructor).isOfClass(fileClass);
                 return isAOfClassB(file, fileClass);
             }
         );
+
+        return orderReversal ? files.reverse() : files;
     }
 
-    getGroups(propertyType: PropertyType|null, fileClass: ConstructorType<File> = File) {
-        let files = this.getFiles(fileClass);
+    getFileGroups(
+        fileClass:      ConstructorType<File> = File,
+        groupProperty:  PropertyType|null = this.fileCollectionLayout.groupProperty, 
+        groupReversal:  boolean = this.fileCollectionLayout.groupReversal, 
+        orderProperty:  PropertyType = this.fileCollectionLayout.orderProperty, 
+        orderReversal:  boolean = this.fileCollectionLayout.orderReversal
+    ): Array<FileGroup> {
+        let files = this.getFiles(fileClass, orderProperty, orderReversal);
 
         let newFileGroups: FileGroup[] = [];
         
-        if (propertyType == null) {
+        if (groupProperty == null) {
             newFileGroups.push({
-                propertyType: propertyType,
+                propertyType: groupProperty,
                 legiblePropertyValue: null, 
                 files: files
             } as FileGroup);
         }
         else {
             files.forEach(file => {
-                let file_legiblePropValue = this.#toLegible(file.propertyMap.get(propertyType));
+                let file_legiblePropValue = this.#toLegible(file.propertyMap.get(groupProperty));
                 let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
 
                 if (fileGroup != null) {
@@ -365,7 +320,7 @@ export class FileCollectionLayout {
                 }
                 else {
                     newFileGroups.push({
-                        propertyType: propertyType,
+                        propertyType: groupProperty,
                         legiblePropertyValue: file_legiblePropValue, 
                         files: [file]
                     });
@@ -374,12 +329,12 @@ export class FileCollectionLayout {
         }
 
         newFileGroups.sort((a, b) => {
-            let aVal = a.legiblePropertyValue;
-            let bVal = b.legiblePropertyValue;
-            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+            let aValue = a.legiblePropertyValue;
+            let bValue = b.legiblePropertyValue;
+            return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
         });
         
-        return newFileGroups;
+        return groupReversal ? newFileGroups.reverse() : newFileGroups;
     }
 
     #toLegible(val: any) {
@@ -398,6 +353,17 @@ export class FileCollectionLayout {
         return val;
     }
 }
+
+export class FileCollectionLayout {
+    orderProperty   = $state<PropertyType>(PropertyType.fileName);
+    orderReversal   = $state<boolean>(false);
+    groupProperty   = $state<PropertyType|null>(null);
+    groupReversal   = $state<boolean>(false);
+    previewSize     = $state<number>(19);
+    maxProperties   = $state<number>(1);
+    detailLayout    = $state<DetailLayout>(DetailLayout.Beside);
+    inRows          = $state<boolean>(false);
+};
 
 // Detail Info Properties
 export enum DetailLayout {

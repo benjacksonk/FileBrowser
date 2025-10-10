@@ -37,7 +37,7 @@
         {previewSize} {maxShownProperties} {detailLayout} {inRows}
         showHeader={showHeaders}
         isFirstGroup={index == 0}
-        showFileExtension={browserState.showFileExtensions && fileCollectionLayout.groupedProperty != PropertyType.fileExtension}
+        showFileExtension={browserState.showFileExtensions && fileCollectionLayout.groupProperty != PropertyType.fileExtension}
         />
         {/each}
     </div>

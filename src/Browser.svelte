@@ -25,12 +25,12 @@
             />
             
             <FileCollectionUI
-                fileGroups={browserState.rootFileSector.fileCollectionLayout.getGroups(browserState.fileCollectionLayout.groupedProperty, FileSector)}
+                fileGroups={browserState.rootFileSector.getFileGroups(FileSector, browserState.fileCollectionLayout.groupProperty, browserState.fileCollectionLayout.groupReversal, browserState.fileCollectionLayout.orderProperty, browserState.fileCollectionLayout.orderReversal)}
                 fileCollectionLayout={browserState.fileCollectionLayout}
                 detailLayout={DetailLayout.Beside}
                 inRows={false}
                 textSize={browserState.textSize}
-                showHeaders={browserState.fileCollectionLayout.groupedProperty != null}
+                showHeaders={browserState.fileCollectionLayout.groupProperty != null}
             />
         </div>
         {/if}
@@ -43,14 +43,14 @@
             
             <FileCollectionUI 
                 fileGroups={browserState.splitSubsectors ? 
-                    browserState.rootFileSector.fileCollectionLayout.getGroups(browserState.rootFileSector.fileCollectionLayout.groupedProperty, Asset) : 
-                    browserState.rootFileSector.fileCollectionLayout.getGroups(browserState.rootFileSector.fileCollectionLayout.groupedProperty, File)
+                    browserState.rootFileSector.getFileGroups(Asset) : 
+                    browserState.rootFileSector.getFileGroups()
                 }
                 fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
-                detailLayout={browserState.rootFileSector.detailLayout}
-                inRows={browserState.rootFileSector.inRows}
+                detailLayout={browserState.rootFileSector.fileCollectionLayout.detailLayout}
+                inRows={browserState.rootFileSector.fileCollectionLayout.inRows}
                 textSize={browserState.textSize}
-                showHeaders={browserState.rootFileSector.fileCollectionLayout.groupedProperty != null}
+                showHeaders={browserState.rootFileSector.fileCollectionLayout.groupProperty != null}
             />
         </div>
     </div>
