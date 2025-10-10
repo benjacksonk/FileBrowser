@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DetailLayout, PropertyType, type File } from "$lib/types.svelte";
+    import { DetailLayout, File, PropertyType } from "$lib/types.svelte";
 
     let {
         file: file = $bindable(),
@@ -37,6 +37,7 @@
         style:justify-items={textBelow ? "start" : "center"}
     >
         <span class="fileName">
+            <!-- {file[getClassNameSymbol]()} -->
             {file.propertyMap.get(PropertyType.fileName)}{#if showFileExtension && (file.propertyMap.get(PropertyType.fileExtension) != "")}<span class="extension">{`.${file.propertyMap.get(PropertyType.fileExtension)}`}</span>{/if}
         </span>
 

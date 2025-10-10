@@ -25,7 +25,7 @@
             />
             
             <FileCollectionUI
-                fileGroups={browserState.rootFileSector.fileCollectionLayout.getGroups<FileSector>(browserState.fileCollectionLayout.groupedProperty, FileSector)}
+                fileGroups={browserState.rootFileSector.fileCollectionLayout.getGroups(browserState.fileCollectionLayout.groupedProperty, FileSector)}
                 fileCollectionLayout={browserState.fileCollectionLayout}
                 detailLayout={DetailLayout.Beside}
                 inRows={false}
@@ -43,8 +43,8 @@
             
             <FileCollectionUI 
                 fileGroups={browserState.splitSubsectors ? 
-                    browserState.rootFileSector.fileCollectionLayout.getGroups<Asset>(browserState.rootFileSector.fileCollectionLayout.groupedProperty, Asset) : 
-                    browserState.rootFileSector.fileCollectionLayout.getGroups<File>(browserState.rootFileSector.fileCollectionLayout.groupedProperty, File)
+                    browserState.rootFileSector.fileCollectionLayout.getGroups(browserState.rootFileSector.fileCollectionLayout.groupedProperty, Asset) : 
+                    browserState.rootFileSector.fileCollectionLayout.getGroups(browserState.rootFileSector.fileCollectionLayout.groupedProperty, File)
                 }
                 fileCollectionLayout={browserState.rootFileSector.fileCollectionLayout}
                 detailLayout={browserState.rootFileSector.detailLayout}

@@ -1,3 +1,21 @@
+type ConstructorType<T = any> = (new (...args: any) => T);
+
+// declare global {
+//     interface Object {
+//         isOfClass(a: ConstructorType): boolean;
+//     }
+// }
+// Object.prototype.isOfClass = function(a: ConstructorType): boolean { return this instanceof a; };
+/* causes error:
+TypeError [ERR_INVALID_ARG_TYPE]: The "paths[1]" argument must be of type string. Received function 
+at Object.resolve (node:path:214:9) 
+at...
+/**/
+
+function isAOfClassB(a: ConstructorType|Object, b: ConstructorType): boolean {
+    return ((a instanceof Function) ? a.prototype : a) instanceof b;
+};
+
 export enum FileType {
     Uncategorized   = "Uncategorized",
     Application     = "Application",
@@ -22,7 +40,7 @@ export class Format {
     name        = $state("");
     icon        = $state("");
     fileType    = $state(FileType.Uncategorized);
-    extensions  = $state(new Array<string>());
+    extensions  = $state<Array<string>>([]);
 
     static #fileTypePerFormat   = new Map<Format, FileType>();
     
@@ -185,10 +203,21 @@ export class PropertyMap extends Map<PropertyType, any> {
     }
 }
 
+// export const getClassNameSymbol = Symbol();
+
 // would be abstract, but that breaks the type check in fileCollection.getGroups
 export class File {
-    readonly propertyMap: PropertyMap
-    = $state(new PropertyMap());
+    readonly propertyMap = $state(new PropertyMap());
+
+    // static [getClassNameSymbol]() {
+    //     // return "File"
+    //     this.name;
+    // }
+
+    // [getClassNameSymbol]() {
+    //     return "File"
+    //     // this.name;
+    // }
 
     constructor(nameWithExtension: string) {
         if (nameWithExtension.includes(".")) {
@@ -206,6 +235,14 @@ export class File {
         return "/images/icon-generic.png";//this.fileType.icon;
     }
 
+    isAsset(): this is Asset {
+        return this instanceof Asset;
+    }
+
+    isSector(): this is FileSector {
+        return this instanceof FileSector;
+    }
+
     toString(): string {
         return this.propertyMap.get(PropertyType.fileName);
     }
@@ -213,7 +250,11 @@ export class File {
 
 // possibly "Artifact"
 export class Asset extends File {
-    #preview: string = $state("");
+    #preview = $state<string>("");
+
+    // override [getClassNameSymbol]() {
+    //     return "Asset";
+    // }
 
     constructor(name: string, preview: string = "") {
         super(name);
@@ -226,11 +267,11 @@ export class Asset extends File {
 }
 
 export class FileSector extends File {
-    #files: Array<File> = $state([]);
-    #fileCollectionLayout: FileCollectionLayout = $state(new FileCollectionLayout());
+    #files                  = $state<Array<File>>([]);
+    #fileCollectionLayout   = $state(new FileCollectionLayout());
 
-    detailLayout: DetailLayout = $state(DetailLayout.Beside);
-    inRows: boolean = $state(false);
+    detailLayout            = $state(DetailLayout.Beside);
+    inRows                  = $state(false);
 
     constructor(name: string, files: File[] = []) {
         super(name);
@@ -257,12 +298,12 @@ export class FileSector extends File {
 }
 
 export class FileCollectionLayout {
-    #files: Array<File> = $state([]);
-    #orderedProperty: PropertyType = $state(PropertyType.fileName);
+    #files              = $state<Array<File>>([]);
+    #orderedProperty    = $state(PropertyType.fileName);
     
-    groupedProperty: PropertyType|null = $state(null);
-    previewSize: number = $state(21);
-    maxProperties: number = $state(1);
+    groupedProperty = $state<PropertyType|null>(null);
+    previewSize     = $state(21);
+    maxProperties   = $state(1);
 
     constructor(files: File[] = []) {
         this.#files = files;
@@ -292,38 +333,45 @@ export class FileCollectionLayout {
         }
     }
 
-    getGroups<T extends File>(propertyType: PropertyType|null, typeT: new (...params : any[]) => T) {
-        let thefiles = this.#files.filter(
-            file => {
-                return file instanceof typeT;
+    getFiles(fileClass: ConstructorType<File> = File) {
+        return this.#files.filter(
+            file => { 
+                // return true;
+                // return (file.constructor).isOfClass(fileClass);
+                return isAOfClassB(file, fileClass);
             }
         );
+    }
 
-        if (propertyType == null) {
-            return new Array<FileGroup>({
-                propertyType: propertyType,
-                legiblePropertyValue: null,
-                files: thefiles
-            } as FileGroup);
-        }
+    getGroups(propertyType: PropertyType|null, fileClass: ConstructorType<File> = File) {
+        let files = this.getFiles(fileClass);
 
         let newFileGroups: FileGroup[] = [];
         
-        thefiles.forEach(file => {
-            let file_legiblePropValue = this.#toLegible(file.propertyMap.get(propertyType));
-            let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
+        if (propertyType == null) {
+            newFileGroups.push({
+                propertyType: propertyType,
+                legiblePropertyValue: null, 
+                files: files
+            } as FileGroup);
+        }
+        else {
+            files.forEach(file => {
+                let file_legiblePropValue = this.#toLegible(file.propertyMap.get(propertyType));
+                let fileGroup = newFileGroups.find(it => it.legiblePropertyValue === file_legiblePropValue);
 
-            if (fileGroup != null) {
-                fileGroup.files.push(file);
-            }
-            else {
-                newFileGroups.push({
-                    propertyType: propertyType,
-                    legiblePropertyValue: file_legiblePropValue, 
-                    files: [file]
-                });
-            }
-        });
+                if (fileGroup != null) {
+                    fileGroup.files.push(file);
+                }
+                else {
+                    newFileGroups.push({
+                        propertyType: propertyType,
+                        legiblePropertyValue: file_legiblePropValue, 
+                        files: [file]
+                    });
+                }
+            });
+        }
 
         newFileGroups.sort((a, b) => {
             let aVal = a.legiblePropertyValue;
