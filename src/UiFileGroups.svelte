@@ -43,7 +43,7 @@ style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
     >
         {#if showHeaders}
         <div class="groupHeader">
-            <span class="groupHeaderText">{fileGroup.legiblePropertyValue}</span>
+            <span class="groupHeaderText">{fileGroup.legiblePropertyValue == "" ? "Assorted" : fileGroup.legiblePropertyValue}</span>
         </div>
         {/if}
 
@@ -70,18 +70,15 @@ style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
 <style>
     .UiFileGroups {
         display: flex;
-        gap: 0 var(--space-3);
-        background: #322;
     }
 
     .fileGroup {
-        overflow: hidden;
+        min-width: max-content;
         display: grid;
 
         grid-auto-rows: auto;
         grid-template-columns: auto;
         align-content: start;
-        background: #3458;
     }
 
     .groupHeader {
@@ -103,7 +100,6 @@ style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
 
     .files {
         overflow: hidden;
-
         flex-flow: column wrap;
         flex-grow: 1;
         grid-auto-rows: auto;

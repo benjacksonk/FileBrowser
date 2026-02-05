@@ -65,7 +65,6 @@
 
 <style>
     .UiFile {
-        width: max-content;
         display: flex;
         padding: var(--space-0) var(--space-4);
     }
