@@ -1,21 +1,3 @@
-type ConstructorType<T = any> = (new (...args: any) => T);
-
-// declare global {
-//     interface Object {
-//         isOfClass(a: ConstructorType): boolean;
-//     }
-// }
-// Object.prototype.isOfClass = function(a: ConstructorType): boolean { return this instanceof a; };
-/* causes error:
-TypeError [ERR_INVALID_ARG_TYPE]: The "paths[1]" argument must be of type string. Received function 
-at Object.resolve (node:path:214:9) 
-at...
-/**/
-
-function isAOfClassB(a: ConstructorType|Object, b: ConstructorType): boolean {
-    return ((a instanceof Function) ? a.prototype : a) instanceof b;
-};
-
 export enum FileType {
     Uncategorized   = "Uncategorized",
     Application     = "Application",
@@ -267,11 +249,13 @@ export class FileSector extends File {
     }
 
     getFiles(
-        fileClass: ConstructorType<File> = File, 
+        fileClass: typeof File = File, 
         orderProperty: PropertyType = this.fileCollectionLayout.orderProperty, 
         orderReversal: boolean = this.fileCollectionLayout.orderReversal
     ): Array<File> {
-        let files = this.#files.toSorted((fileA: File, fileB: File): number => {
+        let files = [...this.#files]
+        .filter(file => file instanceof fileClass)
+        .sort((fileA: File, fileB: File): number => {
             let valueA = fileA.propertyMap.get(orderProperty);
             let valueB = fileB.propertyMap.get(orderProperty);
 
@@ -281,19 +265,13 @@ export class FileSector extends File {
             }
 
             return valueA < valueB ? -1 : (valueA > valueB ? 1 : 0);
-        }).filter(
-            file => { 
-                // return true;
-                // return (file.constructor).isOfClass(fileClass);
-                return isAOfClassB(file, fileClass);
-            }
-        );
+        });
 
         return orderReversal ? files.reverse() : files;
     }
 
     getFileGroups(
-        fileClass:      ConstructorType<File> = File,
+        fileClass:      typeof File = File,
         groupProperty:  PropertyType|null = this.fileCollectionLayout.groupProperty, 
         groupReversal:  boolean = this.fileCollectionLayout.groupReversal, 
         orderProperty:  PropertyType = this.fileCollectionLayout.orderProperty, 
@@ -362,7 +340,8 @@ export class FileCollectionLayout {
     previewSize     = $state<number>(19);
     maxProperties   = $state<number>(1);
     detailLayout    = $state<DetailLayout>(DetailLayout.Beside);
-    inRows          = $state<boolean>(false);
+    stackFiles      = $state<boolean>(true);
+    showExtensions  = $state<boolean>(true);
 };
 
 // Detail Info Properties

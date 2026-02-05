@@ -4,9 +4,8 @@ import { FileCollectionLayout } from "./types.svelte";
 export const browserState = $state({
     fileCollectionLayout: new FileCollectionLayout(),
     rootFileSector: fileTreeState,
-    showFileExtensions: true,
     splitSubsectors: false,
-    textSize: 13,
+    textSize: 15,
 
-    defaultPreviewSize: 21
+    defaultPreviewSize: 19
 });

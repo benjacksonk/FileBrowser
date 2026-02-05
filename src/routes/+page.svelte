@@ -1,19 +1,23 @@
 <script>
-    import Browser from "../Browser.svelte";
+    import UiDesktop from "../UiDesktop.svelte";
 </script>
 
 
 
 <main>
-    <Browser/>
+    <UiDesktop/>
 </main>
 
 
 
 <style>
     main {
+        overflow: hidden;
         width: 100%;
-        height: 100cqh;
+        height: 100%;
         display: grid;
+        
+        justify-content: stretch;
+        align-content: stretch;
     }
 </style>

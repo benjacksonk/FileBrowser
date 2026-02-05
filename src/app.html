@@ -14,11 +14,6 @@
 
 
 <style>
-	:root, html, body, *, *::before, *::after {
-		box-sizing: border-box;
-		padding: 0;
-		margin: 0;
-	}
 	:root {
 		--pfont: 'Comme','Lato','Radio Canada',sans-serif;
 		--hfont: 'Noto Serif', 'Droid Serif', 'Open Serif', 'Roboto Slab', var(--pfont), serif;
@@ -65,7 +60,14 @@
 		--gray-12: #1f1f1f;
 	}
 	*, *::before, *::after {
+		box-sizing: border-box;
+		padding: 0;
+		margin: 0;
 		font-size: 1rem;
+	}
+	body {
+		width: 100dvw;
+		height: 100dvh;
 	}
 	p, span, button {
 		font-size: 1rem;
@@ -99,6 +101,10 @@
 		display: block;
 	}
 	p img, span img { display: inline-block; }
+
+	.placeholder {
+		background-color: #7772;
+	}
 
 	.hidden { visibility: hidden !important; }
 	.removed { display: none !important; }
