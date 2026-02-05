@@ -4,6 +4,7 @@
     import UiFileBrowserConfig from "./UiFileBrowserConfig.svelte";
     import UiFileGroups from "./UiFileGroups.svelte";
     import UiFileCollectionLayout from "./UiFileCollectionLayout.svelte";
+    import UiWindowControls from "./UiWindowControls.svelte";
 </script>
 
 
@@ -16,7 +17,9 @@ browserState.splitSubsectors ?
 }
 >
     <div class="titleBar">
+        <span class="titleBarLeftControls"></span>
         <span>Typical Window Title</span>
+        <UiWindowControls/>
     </div>
 
     {#if browserState.splitSubsectors}
@@ -76,9 +79,12 @@ browserState.splitSubsectors ?
 
     .titleBar {
         grid-column: 1 / -1;
-        display: grid;
+        border-bottom: 1px solid #fff1;
+        display: flex;
 
-        justify-content: center;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .filePane {
