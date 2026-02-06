@@ -69,12 +69,26 @@ browserState.splitSubsectors ?
         overflow: hidden;
         width: 100%;
         height: 100%;
-        background-color: var(--gray-9);
+        border: 1px solid #494949;
+        border-radius: 13px;
         color: white;
         display: grid;
 
         grid-template-rows: max-content auto;
         grid-auto-rows: max-content;
+        
+        backdrop-filter: blur(64px);
+        box-shadow: 0px 1px 8px 5px #0007;
+            
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(in oklab to bottom, #222d), url(https://grainy-gradients.vercel.app/noise.svg);
+            z-index: -1;
+            /* opacity: 50%; */
+        }
     }
 
     .titleBar {

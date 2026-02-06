@@ -24,7 +24,7 @@
 
 <style>
     .UiWindowControls {
-        background-color: #321;
+        /* background-color: #321; */
         display: flex;
 
         flex-flow: row nowrap;
@@ -38,7 +38,7 @@
         width: 29px;
         height: 29px;
         padding: 4px;
-        background-color: #444;
+        /* background-color: #444; */
         display: grid;
         
         justify-content: center;
