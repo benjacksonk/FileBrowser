@@ -9,7 +9,7 @@
 
 
 
-<div class="UiBrowser"
+<div class="UiBrowser glass"
 style:grid-template-columns={
 browserState.splitSubsectors ? 
 "minmax(0,max-content) minmax(0,auto)" : 
@@ -69,7 +69,7 @@ browserState.splitSubsectors ?
         overflow: hidden;
         width: 100%;
         height: 100%;
-        border: 1px solid #494949;
+        border: 2px solid #4449;
         border-radius: 13px;
         color: white;
         display: grid;
@@ -77,18 +77,7 @@ browserState.splitSubsectors ?
         grid-template-rows: max-content auto;
         grid-auto-rows: max-content;
         
-        backdrop-filter: blur(64px);
         box-shadow: 0px 1px 8px 5px #0007;
-            
-        &::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: linear-gradient(in oklab to bottom, #222d), url(https://grainy-gradients.vercel.app/noise.svg);
-            z-index: -1;
-            /* opacity: 50%; */
-        }
     }
 
     .titleBar {
@@ -110,7 +99,7 @@ browserState.splitSubsectors ?
         grid-auto-flow: column;
         grid-template: subgrid / subgrid;
 
-        &:not(:first-of-type) {
+        &:nth-child(n+2 of .filePane) {
             border-left: 1px solid var(--gray-7);
         }
     }
