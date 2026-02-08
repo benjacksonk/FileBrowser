@@ -13,10 +13,8 @@
     </div>
 
     <div class="windowControl closeButton">
-        <div class="windowControlIcon closeIcon">
-            <div class="closeIconHalf"></div>
-            <div class="closeIconHalf"></div>
-        </div>
+        <div class="windowControlIcon closeIconHalf"></div>
+        <div class="windowControlIcon closeIconHalf"></div>
     </div>
 </div>
 
@@ -35,9 +33,25 @@
     }
 
     .windowControl {
-        width: 29px;
-        height: 29px;
-        padding: 4px;
+        --pillIconLong: 21;
+        --pillIconShort: 13;
+        --pillIconRadial: calc(var(--pillIconShort) / 2);
+        --pillArea: calc(((var(--pillIconLong) - var(--pillIconShort)) * var(--pillIconShort)) + (pi * pow(var(--pillIconRadial), 2)));
+
+        --pillIconLength: calc(1px * var(--pillIconLong));
+        --pillIconWidth: calc(1px * var(--pillIconShort));
+        --pillIconRadius: calc(1px * var(--pillIconRadial));
+        --pillEqualCircleRadius: calc(1px * sqrt(var(--pillArea) / pi));
+        --pillEqualCircleDiameter: calc(var(--pillEqualCircleRadius) * 2);
+        --pillEqualSquircleWidth: calc(1px * sqrt(var(--pillArea) + ((4 - pi) * pow(var(--pillIconRadial), 2))));
+
+        --pillIconSlantWidth: calc(((var(--pillIconLength) - var(--pillIconWidth)) / sqrt(2)) + var(--pillIconWidth));
+        --pillIconSlantHalfNegSpace: calc((var(--pillIconLength) - var(--pillIconSlantWidth)) / 2);
+        --pillIconPad: 13px;
+
+        position: relative;
+        width: calc(var(--pillIconLength) + (var(--pillIconPad) / 2));
+        height: var(--pillIconLength);
         /* background-color: #444; */
         display: grid;
         
@@ -45,64 +59,69 @@
         align-content: center;
         justify-items: center;
         align-items: center;
+
+        &.closeButton {
+            /* width: calc(var(--pillIconSlantWidth) + (var(--pillIconPad) / 2)); */
+        }
         
-        .windowControlIcon,
+        .windowControlIcon, 
         .closeIconHalf {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            translate: -50% -50%;
             transition: 0.05s ease-out;
+        }
+        
+        .minimizeIcon,
+        .maximizeIcon,
+        .closeIconHalf {
+            width: var(--pillEqualCircleDiameter);
+            height: var(--pillEqualCircleDiameter);
+            border-radius: var(--pillEqualCircleRadius);
         }
 
         .minimizeIcon {
-            width: 21px;
-            height: 13px;
-            border-radius: 6.5px;
-            background-color: #8ca9ff;
+            background-color: #5ec776;
         }
         &:hover .minimizeIcon {
-            width: 13px;
+            width: var(--pillIconLength);
+            height: var(--pillIconWidth);
+            border-radius: var(--pillIconRadius);
         }
 
         .maximizeIcon {
-            width: 13px;
-            height: 21px;
-            border-radius: 6.5px;
-            background-color: #6ec480;
+            background-color: #d4a703;
         }
         &:hover .maximizeIcon {
-            /* height: 13px; */
+            /* width: var(--pillEqualSquircleWidth); */
+            /* height: var(--pillEqualSquircleWidth); */
+            /* border-radius: var(--pillIconRadius); */
             
-            width: 21px;
-            border-radius: 10.5px;
+            width: var(--pillIconWidth);
+            height: var(--pillIconLength);
+            border-radius: var(--pillIconRadius);
         }
 
-        .closeIcon {
-            display: grid;
-            grid-template: auto / auto;
-            justify-content: center;
-            align-content: center;
-            justify-items: center;
-            align-items: center;
+        .closeIconHalf {
+            /* width: var(--pillIconWidth); */
+            /* height: var(--pillIconLength); */
+            /* border-radius: var(--pillIconRadius); */
+            background-color: #ff8474;
             rotate: 45deg;
-            
-            .closeIconHalf {
-                grid-row: 1;
-                grid-column: 1;
-                width: 13px;
-                height: 21px;
-                border-radius: 6.5px;
-                background-color: #f48c7d;
 
-                &:nth-child(2) {
-                    height: 13px;
-                    rotate: 90deg;
-                }
+            &:nth-child(2 of .closeIconHalf) {
+                rotate: -45deg;
+                visibility: hidden;
             }
         }
         &:hover .closeIconHalf {
-            &, 
-            &:nth-child(2) {
-                width: 5px;
-                height: 27px;
-                border-radius: 50%;
+            width: 5px;
+            height: 27px;
+            border-radius: 50%;
+
+            &:nth-child(2 of .closeIconHalf) {
+                visibility: visible;
             }
         }
     }

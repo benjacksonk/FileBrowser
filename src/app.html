@@ -22,9 +22,7 @@
 		font-size: 11.2pt;
 
 		--phi: calc(sqrt(5 / 4) + (1 / 2));
-		--filter-glass: blur(128px);
-		--filter-acrylic: blur(128px) contrast(calc(1 / pow(2, 1 / 4)));
-		--filter-plastic: blur(128px) contrast(calc(1 / pow(2, 1 / 2)));
+		--noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 500 500' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         
         --font-size-0: calc(1rem * pow(2, -0.5));
         --font-size-1: 1rem;
@@ -128,25 +126,31 @@
 		text-shadow: 0 1px 3px var(--color-key-12);
 	}
 
-	.glass, .acrylic, .plastic {
-        &::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: linear-gradient(in oklab to bottom, #121212ea), url(https://grainy-gradients.vercel.app/noise.svg);
-            z-index: -1;
-            opacity: 91.7%;
-        }
-	}
 	.glass {
-        backdrop-filter: var(--filter-glass);
-	}
-	.acrylic {
-        backdrop-filter: var(--filter-acrylic);
-	}
-	.plastic {
-        backdrop-filter: var(--filter-plastic);
+		--glassBG: #252525;
+		background: oklch(from var(--glassBG) l c h / 0.67);
+		
+		> *:not(.glass) {
+			position: relative;
+		}
+
+        &::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+        	backdrop-filter: blur(128px);
+            background: 
+				linear-gradient(in oklab to bottom, var(--glassBG)), /* arbitrarily desired luminosity */
+				linear-gradient(in oklab to bottom, #80808080), /* arbitratily desired denoising */
+				linear-gradient(in oklab to bottom, #949494), /* correction toward 128 grey */
+				var(--noise), /* semitransparent noise */
+				linear-gradient(in oklab to bottom, #fff) /* base color */;
+			background-size: 500px 500px;
+			background-repeat: repeat;
+			background-blend-mode: hard-light, normal, multiply, normal, normal;
+			mix-blend-mode: luminosity;
+        }
 	}
 
 	.row {
