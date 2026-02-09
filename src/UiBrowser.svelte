@@ -72,7 +72,6 @@ browserState.splitSubsectors ?
         position: relative;
         width: 100%;
         height: 100%;
-        border: 2px solid #4449;
         border-radius: 13px;
         color: white;
         display: grid;
@@ -80,7 +79,7 @@ browserState.splitSubsectors ?
         grid-template-rows: max-content auto;
         grid-auto-rows: max-content;
         
-        box-shadow: 0px 1px 8px 5px #0007;
+        box-shadow: 0px 1px 8px 5px #00000080;
     }
 
     .titleBar {

@@ -21,13 +21,13 @@
 
     let textBelow: boolean = $derived(detailLayout === DetailLayout.Below);
     let gapX: number = $derived(Math.sqrt(Math.max(textSize, previewSize)));
-    let gapY: number = $derived((2 * Math.sqrt(Math.max(textSize, previewSize))));
+    let gapY: number = $derived(Math.sqrt(Math.max(textSize, previewSize)));
 </script>
 
 
 
 <div class="UiFile" 
-    style:gap={`${gapX}px ${gapY}px`} 
+    style:gap={`${gapY}px ${gapX}px`} 
     style:flex-flow={textBelow ? "column" : "row"}
     style:align-items={"center"} 
     style:justify-items={textBelow ? "start" : "center"}

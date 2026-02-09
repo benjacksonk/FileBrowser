@@ -128,7 +128,7 @@
 
 	.glass {
 		--glassBG: #252525;
-		background: oklch(from var(--glassBG) l c h / 0.67);
+		background: oklch(from var(--glassBG) l c h / 0.84);
 		
 		> *:not(.glass) {
 			position: relative;
@@ -139,6 +139,8 @@
 			position: absolute;
 			inset: 0;
 			pointer-events: none;
+        	border: 2px solid #77777729;
+			border-radius: inherit;
         	backdrop-filter: blur(128px);
             background: 
 				linear-gradient(in oklab to bottom, var(--glassBG)), /* arbitrarily desired luminosity */

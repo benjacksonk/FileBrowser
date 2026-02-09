@@ -22,13 +22,25 @@
     "/images/wallpaper-Unsplash-JonFlobrant.jpg",
     "/images/wallpaper-Unsplash-LucaBravo.jpg"
    ];
+
+   let wallpaperIndex: number = 0;
+
+    function cycleWallpaper() {
+        wallpaperIndex = (wallpaperIndex + 1) % wallpaperUrls.length;
+    }
 </script>
 
 
 
-<div class="UiDesktop"
-style:background-image={`url(${wallpaperUrls[1]})`}
->
+<div class="UiDesktop">
+    <button 
+    class="wallpaper" 
+    aria-label="wallpaper"
+    style:background-image={`url(${wallpaperUrls[wallpaperIndex]})`}
+    on:click={cycleWallpaper}
+    >
+    </button>
+
     <div class="frameBrowser">
         <UiBrowser/>
     </div>
@@ -41,7 +53,14 @@ style:background-image={`url(${wallpaperUrls[1]})`}
         overflow: hidden;
         width: 100%;
         height: 100%;
+    }
 
+    .wallpaper {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: unset;
         background-color: #273441;
         background-repeat: no-repeat;
         background-size: cover;
@@ -50,6 +69,6 @@ style:background-image={`url(${wallpaperUrls[1]})`}
     .frameBrowser {
         width: 100%;
         height: 100%;
-        padding: 20px;
+        padding: 5dvh 5dvw;
     }
 </style>
