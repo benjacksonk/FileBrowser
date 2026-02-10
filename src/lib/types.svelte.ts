@@ -337,7 +337,7 @@ export class FileCollectionLayout {
     orderReversal   = $state<boolean>(false);
     groupProperty   = $state<PropertyType|null>(null);
     groupReversal   = $state<boolean>(false);
-    previewSize     = $state<number>(19);
+    previewSize     = $state<number>(30);
     maxProperties   = $state<number>(1);
     detailLayout    = $state<DetailLayout>(DetailLayout.Beside);
     stackFiles      = $state<boolean>(true);

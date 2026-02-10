@@ -20,26 +20,27 @@
     } = $props();
 
     let textBelow: boolean = $derived(detailLayout === DetailLayout.Below);
-    let gapX: number = $derived(Math.sqrt(Math.max(textSize, previewSize)));
-    let gapY: number = $derived(Math.sqrt(Math.max(textSize, previewSize)));
+    let paddingScale: number = $derived(1.5 * Math.sqrt(Math.max(textSize, previewSize)));
+    let iconGap: number = $derived(previewSize == 0 ? 0 : Math.sqrt(4.5 * Math.max(textSize, previewSize)));
 </script>
 
 
 
 <div class="UiFile" 
-    style:gap={`${gapY}px ${gapX}px`} 
-    style:flex-flow={textBelow ? "column" : "row"}
-    style:align-items={"center"} 
-    style:justify-items={textBelow ? "start" : "center"}
+style:padding={`${paddingScale}px`}
+style:gap={`${iconGap}px`} 
+style:flex-flow={textBelow ? "column" : "row"}
+style:align-items={"center"} 
+style:justify-items={textBelow ? "start" : "center"}
 >
     <img class="filePreview" alt="" src={file.preview} style:height={`${previewSize}px`}>
 
-    <div class="fileDescription" style:font-size={`${textSize}px`} 
-        style:align-items={textBelow ? "center" : "start"} 
-        style:justify-items={textBelow ? "start" : "center"}
+    <div class="fileDescription" 
+    style:font-size={`${textSize}px`} 
+    style:align-items={textBelow ? "center" : "start"} 
+    style:justify-items={textBelow ? "start" : "center"}
     >
         <span class="fileName">
-            <!-- {file[getClassNameSymbol]()} -->
             {file.propertyMap.get(PropertyType.fileName)}{#if showFileExtension && (file.propertyMap.get(PropertyType.fileExtension) != "")}<span class="extension">{`.${file.propertyMap.get(PropertyType.fileExtension)}`}</span>{/if}
         </span>
 
@@ -66,7 +67,6 @@
 <style>
     .UiFile {
         display: flex;
-        padding: var(--space-0) var(--space-4);
     }
 
     .filePreview {
@@ -74,15 +74,15 @@
     }
 
     .fileDescription {
-        /* width: max-content; */
         text-wrap: nowrap;
         display: flex;
 
         flex-flow: column nowrap;
 
         .fileName {
-            /* width: max-content; */
             font-size: inherit;
+            display: flex;
+            flex-flow: row nowrap;
 
             > .extension {
                 font-size: inherit;
@@ -91,20 +91,14 @@
         }
         
         .fileProperties {
-            /* width: fit-content; */
             color: var(--gray-3);
             font-size: inherit;
             display: flex;
 
             flex-flow: column nowrap;
-            gap: 0.38cap;
 
             .fileProperty {
                 font-size: inherit;
-
-                &:first-of-type {
-                    padding-top: 0.38cap;
-                }
             }
         }
     }

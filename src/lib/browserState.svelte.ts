@@ -5,7 +5,7 @@ export const browserState = $state({
     fileCollectionLayout: new FileCollectionLayout(),
     rootFileSector: fileTreeState,
     splitSubsectors: false,
-    textSize: 15,
+    textSize: 14,
 
-    defaultPreviewSize: 19
+    defaultPreviewSize: 30
 });

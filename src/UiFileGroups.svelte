@@ -29,7 +29,10 @@
     
     let showExtensions: boolean = $derived(fileCollectionLayout.showExtensions && fileCollectionLayout.groupProperty != PropertyType.fileExtension);
 
-    let fileHeightPx: number = $derived(Math.max(fileCollectionLayout.previewSize, textSize))
+    let fileHeightPx: number = $derived(Math.max(fileCollectionLayout.previewSize, textSize));
+
+    let headerPaddingScale: number = $derived(1.5 * Math.sqrt(Math.max(textSize, previewSize)));
+    let stackedGroupGap: number = $derived(Math.sqrt(35 * Math.max(textSize / 2, previewSize)));
 </script>
 
 
@@ -37,12 +40,16 @@
 <div class="UiFileGroups"
 style:overflow={stackGroups ? "hidden auto" : "auto hidden"}
 style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
+style:gap={`${stackedGroupGap}px 0px`}
 >
     {#each fileGroups as fileGroup, i}
     <div class="fileGroup"
     >
         {#if showHeaders}
-        <div class="groupHeader">
+        <div class="groupHeader"
+        style:font-size={`${textSize}px`} 
+        style:padding-left={`${headerPaddingScale}px`}
+        >
             <span class="groupHeaderText">{fileGroup.legiblePropertyValue == "" ? "Assorted" : fileGroup.legiblePropertyValue}</span>
         </div>
         {/if}
@@ -74,6 +81,7 @@ style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
 
     .fileGroup {
         min-width: max-content;
+        padding: 0 var(--space-4);
         display: grid;
 
         grid-auto-rows: auto;
@@ -84,7 +92,6 @@ style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
     .groupHeader {
         /* position: sticky; */
         align-self: start;
-        padding: 0 var(--space-5);
         color: var(--gray-0);
         font-weight: 500;
         display: grid;
@@ -94,6 +101,7 @@ style:flex-flow={`${stackGroups ? "column" : "row"} nowrap`}
     }
 
     .groupHeaderText {
+        font-size: inherit;
         text-wrap: wrap;
         padding: 0.618cap 0;
     }
