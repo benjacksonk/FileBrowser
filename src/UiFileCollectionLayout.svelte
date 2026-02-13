@@ -48,7 +48,7 @@
     {#if detailed}
     <div class="sectorViewConfigColumn">
         <label>
-            <span>Detail Layout:</span>
+            <span>Details:</span>
             <input class="numInput" type="number" min="1" max="9" step="1" bind:value={fileCollectionLayout.maxProperties}/>
             <select bind:value={fileCollectionLayout.detailLayout}>
                 {#each Object.values(DetailLayout) as detailLayoutMode}

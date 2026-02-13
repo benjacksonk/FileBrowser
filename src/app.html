@@ -130,33 +130,60 @@
 		text-shadow: 0 1px 3px var(--color-key-12);
 	}
 
-	.glass {
-		--glassBG: #252525;
-		background: oklch(from var(--glassBG) l c h / 0.84);
-		
-		> *:not(.glass) {
+	.window {
+		--darkBG: #23282a; /* #23282a basalt stone slate */
+		--lightBG: #fff;
+		--matteKeyColor: var(--darkBG);
+		--matteBG: oklch(from var(--matteKeyColor) l calc(c / 1) h);
+		--matteTrim: oklch(from var(--matteKeyColor) pow(l * l / 2, 1 / 3) calc(0.707 * c) h);
+	}
+
+	/* FOREGROUND WINDOW */
+	.window.matte {
+		border: 1px solid var(--matteTrim);
+		background: 
+			linear-gradient(in oklab to bottom, oklab(from var(--matteBG) l a b / 100%)), /* arbitrary denoising */
+			linear-gradient(in oklab to bottom, var(--matteBG)), /* desired color */
+			var(--noise), /* semitransparent noise */
+			linear-gradient(in oklab to bottom, #464646) /* base underlies noise to create 128 grey average*/;
+		background-size: 500px 500px;
+		background-repeat: repeat;
+		background-blend-mode: normal, hard-light, normal, normal;
+	}
+
+	/* BACKGROUND WINDOW */
+	*:has(> .glass):not(.glass) {
+		&, & > *:not(.glass) {
 			position: relative;
 		}
-
-        &::before {
+	}
+	.glass {
+		&, &::before, &::after {
 			content: '';
 			position: absolute;
 			inset: 0;
 			pointer-events: none;
-        	border: 2px solid #77777729;
 			border-radius: inherit;
-        	backdrop-filter: blur(128px);
+		}
+		&::before, &::after {
+			border: 1px solid var(--matteTrim);
+		}
+        &::before {
+			backdrop-filter: blur(23px);
             background: 
-				linear-gradient(in oklab to bottom, var(--glassBG)), /* arbitrarily desired luminosity */
-				linear-gradient(in oklab to bottom, #80808080), /* arbitratily desired denoising */
-				linear-gradient(in oklab to bottom, #949494), /* correction toward 128 grey */
+				linear-gradient(in oklab to bottom, oklab(from var(--matteBG) l a b / 60%)), /* arbitrary denoise */
+				linear-gradient(in oklab to bottom, var(--matteBG)), /* desired color */
 				var(--noise), /* semitransparent noise */
-				linear-gradient(in oklab to bottom, #fff) /* base color */;
+				linear-gradient(in oklab to bottom, #464646) /* base underlies noise to create 128 grey average*/;
 			background-size: 500px 500px;
 			background-repeat: repeat;
-			background-blend-mode: hard-light, normal, multiply, normal, normal;
+			background-blend-mode: normal, hard-light, normal, normal;
 			mix-blend-mode: luminosity;
         }
+		&::after {
+			mix-blend-mode: color;
+			background: oklab(from var(--matteBG) l a b / 91.7%);
+		}
 	}
 
 	.row {

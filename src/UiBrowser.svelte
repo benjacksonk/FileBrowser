@@ -9,14 +9,14 @@
 
 
 
-<div class="UiBrowser glass"
+<div class="UiBrowser window"
 style:grid-template-columns={
 browserState.splitSubsectors ? 
 "minmax(0,max-content) minmax(0,auto)" : 
 "minmax(0,auto)"
 }
->   
-    <!-- <div class="glass"></div> -->
+>
+    <div class="glass"></div>
     
     <div class="titleBar">
         <span class="titleBarLeftControls"></span>
@@ -69,7 +69,7 @@ browserState.splitSubsectors ?
 <style>
     .UiBrowser {
         overflow: hidden;
-        position: relative;
+        /* position: relative; */
         width: 100%;
         height: 100%;
         border-radius: 13px;
@@ -85,7 +85,7 @@ browserState.splitSubsectors ?
     .titleBar {
         grid-column: 1 / -1;
         padding: 4px;
-        border-bottom: 1px solid #fff1;
+        border-bottom: 1px solid var(--matteTrim);
         display: flex;
 
         flex-flow: row nowrap;
@@ -103,13 +103,13 @@ browserState.splitSubsectors ?
         grid-template: subgrid / subgrid;
 
         &:nth-child(n+2 of .filePane) {
-            border-left: 1px solid var(--gray-7);
+            border-left: 1px solid var(--matteTrim);
         }
     }
 
     .frame-browserConfig {
         grid-column: 1 / -1;
-        border-top: 1px solid var(--gray-7);
+        border-top: 1px solid var(--matteTrim);
         display: flex;
 
         flex-flow: row wrap;

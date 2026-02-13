@@ -23,7 +23,7 @@
     "/images/wallpaper-Unsplash-LucaBravo.jpg"
    ];
 
-   let wallpaperIndex: number = 0;
+   let wallpaperIndex: number = 1;
 
     function cycleWallpaper() {
         wallpaperIndex = (wallpaperIndex + 1) % wallpaperUrls.length;
@@ -50,12 +50,14 @@
 
 <style>
     .UiDesktop {
+        position: relative;
         overflow: hidden;
         width: 100%;
         height: 100%;
     }
 
     .wallpaper {
+        position: relative;
         position: fixed;
         width: 100%;
         height: 100%;
@@ -67,8 +69,9 @@
     }
 
     .frameBrowser {
-        width: 100%;
-        height: 100%;
-        padding: 5dvh 5dvw;
+        position: relative;
+        width: calc(100% - 10dvw);
+        height: calc(100% - 10dvh);
+        margin: 5dvh 5dvw;
     }
 </style>
